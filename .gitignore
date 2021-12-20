@@ -1,0 +1,4 @@
+utils/ddbb/keys/*
+utils/ddbb/queue.json
+.env
+__pycache__/
