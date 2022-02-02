@@ -55,18 +55,18 @@ async def experiencia(message):
             # Getting user meta
             if user_meta == meta['id']:
                 user_meta = meta
-
+            
             # Next meta
             if user_xp > meta['exp'] and current_meta is None:
                 current_meta = meta
             elif user_xp > meta['exp'] and current_meta is not None and current_meta['exp'] < meta['exp']:
                 current_meta = meta
 
-        if not 'id' in user_meta or (user_meta['id'] != current_meta['id']):
+        if user_meta == 0 or not 'id' in user_meta or ('id' in current_meta and (user_meta['id'] != current_meta['id'])):
             # Update ddbb
             doc_ref.update({'meta': int(current_meta['id'])})
             # Update user roles
-            if 'id' in user_meta:
+            if user_meta != 0 and 'id' in user_meta:
                 await message.author.remove_roles(message.guild.get_role(int(user_meta['rol'])))
             await message.author.add_roles(message.guild.get_role(int(current_meta['rol'])))
 

@@ -1,7 +1,7 @@
 from discord_slash import SlashCommand
 from discord.ext.commands import Bot, Cog, Context, command, check_any
-from commands.admin.funciones.checks import is_enabled_channel
-from commands.together.funciones.discord_together import *
+from commands.admin.commands.checks import is_enabled_channel
+from .commands.discord_together import *
 
 
 class Together(Cog):

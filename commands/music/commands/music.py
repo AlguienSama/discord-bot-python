@@ -54,9 +54,11 @@ async def play(bot: Bot, ctx: Context, url: str):
 def next_song(bot, ctx, skip=True):
     if skip:
         del_queue(ctx, 1, 1)
+    voice = get(bot.voice_clients, guild=ctx.guild)
 
-    reproduce(bot, ctx)
-
+    if not voice.is_playing():
+        reproduce(bot, ctx)
+    
     pass
 
 
@@ -77,13 +79,13 @@ async def skip(bot, ctx, first, last):
 
 async def queue(ctx):
     try:
-        queue = await get_queue(ctx.guild.id)
-    except:
+        queue = get_queue(ctx.guild.id)
+    except Exception as e:
         raise CustomError('Empty Queue')
 
     text = f'```autohotkey\nQUEUE FOR {ctx.guild.name}\n'
     for i, s in enumerate(queue):
-        text += f'#{i+1} : {s["name"]}\n'
+        text += f'#{i+1} : {s["user"]} - {s["url"]}\n'
     text += '```'
     await ctx.send(text)
 
@@ -105,13 +107,10 @@ def del_queue(ctx, first, last):
 def reproduce(bot, ctx):
     voice = get(bot.voice_clients, guild=ctx.guild)
     song = get_queue(ctx.guild.id)
-    print(song)
     if song == []:
         print('finished')
         return
     song = song[0]
-    print('SONGS')
-    print(song)
 
     if voice.is_playing():
         print('is playing')

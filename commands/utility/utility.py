@@ -2,13 +2,13 @@ from discord_slash import cog_ext
 from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner
-from commands.utilidades.funciones.ping import GetPing
-from commands.utilidades.funciones.say import say
-from .funciones.server import server
-from commands.utilidades.funciones.exp import experiencia, getExp, rank_xp
-from commands.utilidades.funciones.AI import colorizer, super_resolution, waifu2x, text_to_image, toonify
-from commands.admin.funciones.checks import is_enabled_channel, _is_enabled_channel, is_disabled_command
-from commands.together.funciones.discord_together import *
+from .commands.ping import GetPing
+from .commands.say import say
+from .commands.server import server
+from .commands.exp import experiencia, getExp, rank_xp
+from .commands.AI import colorizer, super_resolution, waifu2x, text_to_image, toonify
+from commands.admin.commands.checks import is_enabled_channel, _is_enabled_channel, is_disabled_command
+from commands.together.commands.discord_together import *
 
 
 class Utiles(Cog):
@@ -43,7 +43,6 @@ class Utiles(Cog):
         if message.author.id == self.bot.user.id or message.author.bot:
             return
 
-        #print("mensaje {}".format(message.author))
         return await experiencia(message)
 
     @command(name='xp')

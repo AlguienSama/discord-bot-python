@@ -1,7 +1,7 @@
 from discord_slash import cog_ext
 from discord.ext.commands import *
-from commands.admin.funciones.checks import is_admin
-from .funciones.commands import *
+from commands.admin.commands.checks import is_admin
+from .commands.commands import *
 
 
 class Settings(Cog):
