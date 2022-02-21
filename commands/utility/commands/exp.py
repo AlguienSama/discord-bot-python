@@ -55,14 +55,12 @@ async def experiencia(message):
             # Getting user meta
             if user_meta == meta['id']:
                 user_meta = meta
-            
-            # Next meta
             if user_xp > meta['exp'] and current_meta is None:
                 current_meta = meta
             elif user_xp > meta['exp'] and current_meta is not None and current_meta['exp'] < meta['exp']:
                 current_meta = meta
 
-        if user_meta == 0 or not 'id' in user_meta or ('id' in current_meta and (user_meta['id'] != current_meta['id'])):
+        if user_meta == 0 or not 'id' in user_meta and current_meta is not None and ('id' in current_meta and (user_meta['id'] != current_meta['id'])):
             # Update ddbb
             doc_ref.update({'meta': int(current_meta['id'])})
             # Update user roles
@@ -84,9 +82,11 @@ async def experiencia(message):
                 else:
                     idcanal = int(canal)
                     await message.guild.get_channel(idcanal).send(msg)
-
             else:
                 await message.channel.send(msg)
+            
+            # Log message
+            await message.guild.get_channel(945371397847404554).send(msg)
 
 
 async def getExp(ctx):
