@@ -22,6 +22,10 @@ async def __get_settings__(server: str, type: str, query: str):
     return db.collection(server).document('Settings').collection(type).document(query)
 
 
+async def __get_game__(server: str, type: str, query: str):
+    return db.collection(server).document('games').collection(type).document(query)
+
+
 async def __set__(server: str, type: str, query: str, args: object):
     q = await __get__(server, type, query)
     q.set(args)
@@ -30,6 +34,12 @@ async def __set__(server: str, type: str, query: str, args: object):
 
 async def __set_settings__(server: str, type: str, query: str, args: object):
     q = await __get_settings__(server, type, query)
+    q.set(args)
+    return q
+
+
+async def __set_game__(server: str, type: str, query: str, args: object):
+    q = await __get_game__(server, type, query)
     q.set(args)
     return q
 
@@ -78,7 +88,7 @@ async def set_command(command: str, img: str, user: discord.User, color: int = 0
     return await get_command_by_id(command, id=rand_id)
 
 
-async def set_enabled_commands(server: int, command: str, channels: [int]):
+async def set_enabled_commands(server: int, command: str, channels):
     q = await __get_settings__(str(server), 'commands', command)
     if q.get().to_dict() is None:
         return await __set_settings__(str(server), 'commands', command, {'channels': channels})
@@ -86,7 +96,7 @@ async def set_enabled_commands(server: int, command: str, channels: [int]):
     return q.update({'channels': firestore.firestore.ArrayUnion(channels)})
 
 
-async def set_disabled_commands(server: int, command: str, channels: [int]):
+async def set_disabled_commands(server: int, command: str, channels):
     q = await __get_settings__(str(server), 'commands', command)
 
     if q is None:

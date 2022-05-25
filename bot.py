@@ -1,6 +1,7 @@
 import os
 import firebase_admin
 import discord
+import time, urllib.request
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -17,6 +18,9 @@ description = '''Esto es la descripción para el comando de ayuda predeterminado
 
 errores = {
     355104003572498435,  # Ali
+    528216772592140290,  # Masc
+    226457982773362688,  # Skorpi
+    548655370181279749,  # Von
 }
 bot = commands.Bot(command_prefix=os.getenv('PREFIX'), description=description, owner_ids=errores,
                    case_insensitive=True)
@@ -63,4 +67,18 @@ load_extensions('./commands/together')
 load_extensions('./commands/utility')
 
 TOKEN = os.getenv('DISCORD_TOKEN')
+#bot.run(TOKEN)
+has_internet = False
+
+while not has_internet:
+    try:
+        urllib.request.urlopen('http://google.com')
+        has_internet = True
+    except:
+        has_internet = False
+
+    if not has_internet:
+        print('[+] No internet connection, waiting...')
+        time.sleep(1.0)
+
 bot.run(TOKEN)

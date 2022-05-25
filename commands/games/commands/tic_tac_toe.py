@@ -8,10 +8,10 @@ from utils.responses.Embed import Embed
 
 
 async def tic_tac_toe(bot: Bot, ctx: Context):
-    await ctx.channel.send(f'Esperando que el oponente acepte la partida `{ctx.prefix}accept` (60 segundos)')
+    await ctx.channel.send(f'Esperando que el oponente acepte la partida `{ctx.prefix}a` (60 segundos)')
 
     def check(m):
-        return m.content == f'{ctx.prefix}accept' and m.channel == ctx.channel and m.author.id != ctx.author.id
+        return m.content == f'{ctx.prefix}a' and m.channel == ctx.channel and m.author.id != ctx.author.id
 
     user = None
     try:
@@ -146,7 +146,6 @@ class TicTacToe:
 
     def draw(self) -> bool:
         # Check Rows
-        draw = True
         for row in self.board:
             for num in row:
                 if not (num == self.piece1 or num == self.piece2):

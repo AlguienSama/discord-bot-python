@@ -1,6 +1,9 @@
+from ast import alias
 from discord_slash import SlashCommand
 from discord.ext.commands import *
+from commands.games.commands.connect_4 import conenct_4
 from commands.games.commands.tic_tac_toe import tic_tac_toe
+from commands.games.commands.battle_royale import BattleRoyale
 
 
 class Games(Cog):
@@ -17,6 +20,16 @@ class Games(Cog):
     async def _tic_tac_toe(self, ctx: Context):
         """ """
         return await tic_tac_toe(self.bot, ctx=ctx)
+    
+    @command(name='connect4', aliases=['4raya', '4'])
+    async def _connect_4(self, ctx: Context):
+        """"""
+        return await conenct_4(self.bot, ctx)
+    
+    @command(name='br')
+    async def _join_br(self, ctx: Context, name:str=None, image:str=None):
+        """ """
+        return await BattleRoyale.join(ctx, name, image)
 
 
 def setup(bot: Bot) -> None:
