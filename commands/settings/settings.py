@@ -1,4 +1,3 @@
-from discord_slash import cog_ext
 from discord.ext.commands import *
 from commands.admin.commands.checks import is_admin
 from .commands.commands import *
@@ -21,5 +20,5 @@ class Settings(Cog):
         await disable(ctx, command, channels)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Settings(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Settings(bot))

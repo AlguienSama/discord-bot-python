@@ -1,4 +1,3 @@
-from discord_slash import SlashCommand
 from discord.ext.commands import Bot, Cog, Context, command, check_any
 from commands.admin.commands.checks import is_enabled_channel
 from .commands.discord_together import *
@@ -6,14 +5,7 @@ from .commands.discord_together import *
 
 class Together(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            # Creates new SlashCommand instance to bot if bot doesn't have.
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
-
-    def cog_unload(self):
-        self.bot.slash.remove_cog_commands(self)
 
     @command(name='youtube-together',
              description='Ver vídeos de youtube todos juntos en un chat de voz',
@@ -57,5 +49,5 @@ class Together(Cog):
         return await chess_together(ctx, channel)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Together(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Together(bot))

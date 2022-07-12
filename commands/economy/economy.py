@@ -1,4 +1,3 @@
-from discord_slash import SlashCommand
 from discord.ext.commands import *
 from .commands.balance import balance
 from .commands.work import work
@@ -8,14 +7,7 @@ from .commands.haikoins import *
 
 class Economy(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
-
-    def cog_unload(self):
-        self.bot.slash.remove_cog_commands(self)
-
     @command(name='bal')
     async def bal(self, ctx: Context, user=None):
         """ """
@@ -37,5 +29,5 @@ class Economy(Cog):
         return await get_haikoin(ctx, user)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Economy(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Economy(bot))

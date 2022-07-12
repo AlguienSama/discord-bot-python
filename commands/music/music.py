@@ -1,17 +1,11 @@
-from discord.ext.commands import Bot, Cog, command, check_any, Context
-from discord_slash import SlashCommand
+from discord.ext.commands import Bot, Cog, command, Context
 
-from commands.admin.commands.checks import is_admin
 from commands.music.commands.music import join, play, queue, add_queue, skip
 
 
 class Music(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            # Creates new SlashCommand instance to bot if bot doesn't have.
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
 
     @command(name='join')
     async def _join(self, ctx: Context):
@@ -39,5 +33,5 @@ class Music(Cog):
         return await skip(self.bot, ctx, first, last)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Music(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Music(bot))

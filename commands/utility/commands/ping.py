@@ -1,6 +1,4 @@
-import discord
 from discord.ext.commands import Bot, Context
-from discord_slash import SlashContext
 from utils.responses.Embed import Embed
 
 
@@ -21,7 +19,3 @@ async def GetPing(bot: Bot, ctx: Context):
     # si el comando se llama normalmente
     if type(ctx) == Context:
         return await ctx.send(embed=embed.get_embed())
-
-    # si el comando se llama por Slash
-    elif type(ctx) == SlashContext:
-        return await ctx.send(embeds=[embed.get_embed()])

@@ -2,8 +2,6 @@ import discord
 import json
 
 from firebase_admin import firestore
-from discord.ext.commands import Bot, Context
-from discord_slash import SlashContext
 from random import choice
 from utils.ddbb.DB import get_command
 

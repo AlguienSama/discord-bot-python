@@ -1,11 +1,8 @@
-import json
-import discord
 import datetime
 
 from firebase_admin import firestore
 from discord.ext.commands import Bot, Context
 from discord import User
-from discord_slash import SlashContext
 from utils.responses.Embed import Embed
 from utils.ddbb.DB import get_admin_xp, get_user_xp, top_xp
 
@@ -15,7 +12,12 @@ db = firestore.client()
 async def experiencia(message):
     t = datetime.datetime.utcnow() + datetime.timedelta(minutes=1)
 
-    doc_ref = await get_user_xp(str(message.guild.id), str(message.author.id))
+    doc_ref = None
+    try: 
+        doc_ref = await get_user_xp(str(message.guild.id), str(message.author.id))
+    except:
+        return
+    
     user_xp = doc_ref.get()
 
     xp = 5
@@ -60,33 +62,37 @@ async def experiencia(message):
             elif user_xp > meta['exp'] and current_meta is not None and current_meta['exp'] < meta['exp']:
                 current_meta = meta
 
-        if user_meta == 0 or not 'id' in user_meta and current_meta is not None and ('id' in current_meta and (user_meta['id'] != current_meta['id'])):
-            # Update ddbb
-            doc_ref.update({'meta': int(current_meta['id'])})
-            # Update user roles
-            if user_meta != 0 and 'id' in user_meta:
-                await message.author.remove_roles(message.guild.get_role(int(user_meta['rol'])))
-            await message.author.add_roles(message.guild.get_role(int(current_meta['rol'])))
+        try:
+            if (user_meta == 0 and current_meta is not None) or (not 'id' in user_meta and current_meta is not None and ('id' in current_meta and (user_meta['id'] != current_meta['id'])) and not 'id' in current_meta):
+                # Update ddbb
+                doc_ref.update({'meta': int(current_meta['id'])})
+                # Update user roles
+                if user_meta != 0 and 'id' in user_meta:
+                    await message.author.remove_roles(message.guild.get_role(int(user_meta['rol'])))
+                await message.author.add_roles(message.guild.get_role(int(current_meta['rol'])))
+                    
 
-            # Send msg
-            msg = current_meta['msg'] if 'msg' in current_meta else "Nueva meta alcanzada"
-            msg = msg.replace('%user%', '<@' + str(message.author.id) + '>')
-            if 'canal' in admin_xp:
-                canal = admin_xp['canal']
-                if canal == 'dm':
-                    await message.author.send(msg)
-                elif canal == 'normal':
-                    await message.channel.send(msg)
-                elif canal == 'none':
-                    return
+                # Send msg
+                msg = current_meta['msg'] if 'msg' in current_meta else "Nueva meta alcanzada"
+                msg = msg.replace('%user%', '<@' + str(message.author.id) + '>')
+                if 'canal' in admin_xp:
+                    canal = admin_xp['canal']
+                    if canal == 'dm':
+                        await message.author.send(msg)
+                    elif canal == 'normal':
+                        await message.channel.send(msg)
+                    elif canal == 'none':
+                        return
+                    else:
+                        idcanal = int(canal)
+                        await message.guild.get_channel(idcanal).send(msg)
                 else:
-                    idcanal = int(canal)
-                    await message.guild.get_channel(idcanal).send(msg)
-            else:
-                await message.channel.send(msg)
-            
-            # Log message
-            await message.guild.get_channel(945371397847404554).send(msg)
+                    await message.channel.send(msg)
+                
+                # Log message
+                await message.guild.get_channel(945371397847404554).send(msg)
+        except:
+            pass
 
 
 async def getExp(ctx):
@@ -115,10 +121,6 @@ async def getExp(ctx):
     # si el comando se llama normalmente
     if type(ctx) == Context:
         return await ctx.send(embed=embed)
-
-    # si el comando se llama por Slash
-    elif type(ctx) == SlashContext:
-        return await ctx.send(embeds=[embed])
 
 
 async def rank_xp(bot: Bot, ctx: Context):

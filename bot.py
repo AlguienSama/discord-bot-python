@@ -2,6 +2,7 @@ import os
 import firebase_admin
 import discord
 import time, urllib.request
+import asyncio
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -22,8 +23,11 @@ errores = {
     226457982773362688,  # Skorpi
     548655370181279749,  # Von
 }
-bot = commands.Bot(command_prefix=os.getenv('PREFIX'), description=description, owner_ids=errores,
-                   case_insensitive=True)
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix=os.getenv('PREFIX'), description=description, owner_ids=errores, case_insensitive=True, intents=intents)
 
 
 @bot.event
@@ -31,7 +35,7 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.idle)
     # with open('unknown.png', 'rb') as f:
     #    await bot.user.edit(avatar=f.read())
-    print('Logged in as @' + bot.user.name + '#' + bot.user.discriminator)
+    print(f'Logged in as {bot.user.name}!')
 
 
 @bot.event
@@ -40,31 +44,35 @@ async def on_command_error(ctx, error):
     await errors(ctx, error)
 
 
-def load_extensions(dir):
+async def load_extensions(dir):
     with os.scandir(dir) as files:
         for file in files:
             if dir != './' and os.path.isfile(os.path.join(dir, file.name)) and file.name.endswith('.py'):
                 new_dir = os.path.join(dir, file.name[:-3]).replace('\\', '/')
                 new_dir = new_dir.replace('./', '').replace('/', '.')
                 # print(new_dir)
-                bot.load_extension(new_dir)
+                await bot.load_extension(new_dir)
 
             elif not os.path.isfile(os.path.join(dir, file)):
                 try:
-                    load_extensions(os.path.join(dir, file.name).replace('\\', '/'))
+                    await load_extensions(os.path.join(dir, file.name).replace('\\', '/'))
                 except:
                     pass
 
 
-load_extensions('./commands/admin')
-load_extensions('./commands/economy')
-load_extensions('./commands/games')
-load_extensions('./commands/moderation')
-load_extensions('./commands/music')
-load_extensions('./commands/reactions')
-load_extensions('./commands/settings')
-load_extensions('./commands/together')
-load_extensions('./commands/utility')
+async def load_commands():
+    await load_extensions('./commands/admin')
+    await load_extensions('./commands/economy')
+    await load_extensions('./commands/games')
+    await load_extensions('./commands/moderation')
+    await load_extensions('./commands/music')
+    await load_extensions('./commands/reactions')
+    await load_extensions('./commands/settings')
+    await load_extensions('./commands/together')
+    await load_extensions('./commands/utility')
+    await load_extensions('./commands/tinder')
+
+asyncio.run(load_commands())
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 #bot.run(TOKEN)
@@ -80,5 +88,6 @@ while not has_internet:
     if not has_internet:
         print('[+] No internet connection, waiting...')
         time.sleep(1.0)
+        
 
 bot.run(TOKEN)

@@ -15,7 +15,7 @@ class Embed:
         self.embed = discord.Embed(description=description)
         self.embed.set_footer(text="IT Crowd", icon_url="https://cdn.discordapp.com/emojis/562075100116156418.png")
         if user:
-            self.embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+            self.embed.set_author(name=user.display_name, icon_url=user.avatar.url)
         if title:
             self.embed.title = title
         if description:
@@ -44,6 +44,13 @@ class Embed:
     def add_field(self, title: str, desc: str, inline: bool = False) -> Embed:
         self.embed.add_field(name=title, value=desc, inline=inline)
         return self
+    
+    def set_author(self, name, icon_url) -> Embed:
+        self.embed.set_author(name=name, icon_url=icon_url)
+        return self
+    
+    def set_image(self, image) -> Embed:
+        self.embed.set_image(url=image)
 
     def get_embed(self) -> discord.Embed:
         if self.title:

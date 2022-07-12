@@ -21,8 +21,7 @@ async def tic_tac_toe(bot: Bot, ctx: Context):
         raise CustomError('No puede jugar en soledad, lo siento.')
     else:
         message = await ctx.channel.send(
-            'Recuerda que debes de enviar el número correspondiente a la casilla donde quieres '
-            'poner la ficha...')
+            'Recuerda que debes de enviar el número correspondiente a la casilla donde quieres poner la ficha...')
 
     user = user.author
     if user is None:

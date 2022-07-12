@@ -1,6 +1,3 @@
-from discord_slash import cog_ext
-from discord_slash import SlashCommand
-from discord_slash import SlashContext
 from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner
 from .commands.ping import GetPing
 from .commands.say import say
@@ -13,24 +10,12 @@ from commands.together.commands.discord_together import *
 
 class Utiles(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            # Creates new SlashCommand instance to bot if bot doesn't have.
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
-
-    def cog_unload(self):
-        self.bot.slash.remove_cog_commands(self)
 
     @command(name='ping')
     @check_any(is_enabled_channel())
     async def ping(self, ctx: Context):
         """Ping del bot al host de discord"""
-        return await GetPing(self.bot, ctx=ctx)
-
-    @cog_ext.cog_slash(name="ping")
-    @check_any(is_enabled_channel())
-    async def _ping(self, ctx: SlashContext):
         return await GetPing(self.bot, ctx=ctx)
 
     @Cog.listener()
@@ -56,11 +41,6 @@ class Utiles(Cog):
     async def _rank_xp(self, ctx: Context):
         """ """
         return await rank_xp(self.bot, ctx=ctx)
-
-    @cog_ext.cog_slash(name="xp")
-    @check_any(is_enabled_channel())
-    async def _xp(self, ctx: SlashContext):
-        return await getExp(ctx=ctx)
 
     @command(name='colorear')
     @check_any(is_enabled_channel())
@@ -105,5 +85,5 @@ class Utiles(Cog):
         return await server(ctx)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Utiles(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Utiles(bot))

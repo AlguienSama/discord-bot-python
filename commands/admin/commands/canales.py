@@ -1,12 +1,8 @@
-import json
 import discord
-import datetime
 
 from firebase_admin import firestore
-from discord.ext.commands import Bot, Context
-from discord_slash import SlashContext
-from disputils import BotEmbedPaginator, BotConfirmation
-from utils.responses.Embed import Embed
+from discord.ext.commands import Context
+from disputils import BotEmbedPaginator
 from utils.ddbb.DB import get_admin_channels
 
 
@@ -65,10 +61,6 @@ async def canalesPermitidos(ctx):
     if type(ctx) == Context:
         return await ctx.send(embed=embed)
 
-    # si el comando se llama por Slash
-    elif type(ctx) == SlashContext:
-        return await ctx.send(embeds=[embed])
-
 
 async def quitarCanalesPermitidos(ctx):
     args = ctx.message.content.split(" ")[1:]
@@ -121,10 +113,6 @@ async def quitarCanalesPermitidos(ctx):
     # si el comando se llama normalmente
     if type(ctx) == Context:
         return await ctx.send(embed=embed)
-
-    # si el comando se llama por Slash
-    elif type(ctx) == SlashContext:
-        return await ctx.send(embeds=[embed])
 
 
 async def listaCanalesPermitidos(ctx):

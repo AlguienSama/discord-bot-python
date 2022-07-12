@@ -1,20 +1,13 @@
-from ast import alias
-from discord_slash import SlashCommand
 from discord.ext.commands import *
 from commands.games.commands.connect_4 import conenct_4
+from commands.games.commands.oj_game import oj_game
 from commands.games.commands.tic_tac_toe import tic_tac_toe
 from commands.games.commands.battle_royale import BattleRoyale
 
 
 class Games(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
-
-    def cog_unload(self):
-        self.bot.slash.remove_cog_commands(self)
 
     @command(name='tic_tac_toe', aliases=['3raya', '3'])
     async def _tic_tac_toe(self, ctx: Context):
@@ -30,7 +23,12 @@ class Games(Cog):
     async def _join_br(self, ctx: Context, name:str=None, image:str=None):
         """ """
         return await BattleRoyale.join(ctx, name, image)
+    
+    @command(name='oj')
+    async def _oj_game(self, ctx: Context):
+        """ """
+        return await oj_game(ctx)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Games(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Games(bot))

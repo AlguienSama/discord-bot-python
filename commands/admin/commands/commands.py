@@ -1,10 +1,6 @@
 import discord
 import json
-
-from discord.ext.commands import Bot, Context, MissingRequiredArgument
-from discord_slash import SlashContext
-from utils.responses.Embed import Embed
-from utils.ddbb.DB import set_command, get_command, get_command_list
+from utils.ddbb.DB import get_command, get_command_list
 from disputils import BotEmbedPaginator, BotConfirmation
 from datetime import datetime
 

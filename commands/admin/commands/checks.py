@@ -38,14 +38,21 @@ def is_enabled_channel():
 
 
 async def _is_enabled_channel(message):
-    doc_ref = await get_admin_channels(str(message.guild.id))
-    admin_channels = doc_ref.get()
+    try: 
+        doc_ref = await get_admin_channels(str(message.guild.id))
+        admin_channels = None
+        try: 
+            admin_channels = doc_ref.get()
+        except Exception as e:
+            print('Error: ' + str(e))
 
-    if admin_channels.to_dict() is not None and ('ids' in admin_channels.to_dict()):
-        channels = admin_channels.to_dict()['ids']
-        return message.channel.id in channels
+        if admin_channels.to_dict() is not None and ('ids' in admin_channels.to_dict()):
+            channels = admin_channels.to_dict()['ids']
+            return message.channel.id in channels
 
-    else:
+        else:
+            return True
+    except:
         return True
 
 

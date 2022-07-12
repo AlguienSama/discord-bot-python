@@ -50,5 +50,5 @@ class SlashBot(Cog):
             await ctx.send("slash")
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(SlashBot(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(SlashBot(bot))

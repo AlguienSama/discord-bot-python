@@ -1,10 +1,7 @@
-import json
 import discord
-import datetime
 
 from firebase_admin import firestore
-from discord.ext.commands import Bot, Context
-from discord_slash import SlashContext
+from discord.ext.commands import Context
 from disputils import BotEmbedPaginator, BotConfirmation
 from utils.ddbb.DB import get_admin_xp, get_user_xp, delete_collection
 
@@ -60,10 +57,6 @@ async def Metas(ctx):
         # si el comando se llama normalmente
         if type(ctx) == Context:
             return await ctx.send(embed=embed)
-
-        # si el comando se llama por Slash
-        elif type(ctx) == SlashContext:
-            return await ctx.send(embeds=[embed])
 
     else:
         return await ctx.send("Parametros incorrectos./ <exp> <id rol>")

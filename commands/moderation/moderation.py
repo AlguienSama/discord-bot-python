@@ -1,16 +1,12 @@
-from discord_slash import SlashCommand
 from discord.ext.commands import *
-from discord import User, Member
+from discord import User
 from .commands.punishment import *
 from ..admin.commands.checks import is_admin
 
 
-class Economy(Cog):
+class Moderation(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
 
     @command(name='warn')
     @check_any(is_admin())
@@ -37,5 +33,5 @@ class Economy(Cog):
         return await unban(ctx, user, reason=reason)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Economy(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Moderation(bot))

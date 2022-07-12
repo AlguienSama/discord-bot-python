@@ -1,35 +1,19 @@
-import discord
-from discord_slash import cog_ext
-from discord_slash import SlashCommand
-from discord_slash import SlashContext
 from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner
 from commands.admin.commands.experiencia import Metas, ListaMetas, EliminarMeta, CanalMeta, RemoveExp, AddExp, ResetExp
 from commands.admin.commands.canales import canalesPermitidos, quitarCanalesPermitidos, listaCanalesPermitidos
-from commands.admin.commands.checks import is_admin, is_enabled_channel, is_guild_owner
+from commands.admin.commands.checks import is_admin, is_guild_owner
 from commands.admin.commands.commands import add_command, remove_command, lista_comandos
 from .commands.economy import *
 
 
 class Admin(Cog):
     def __init__(self, bot: Bot):
-        if not hasattr(bot, "slash"):
-            # Creates new SlashCommand instance to bot if bot doesn't have.
-            bot.slash = SlashCommand(bot, override_type=True)
         self.bot = bot
-        self.bot.slash.get_cog_commands(self)
-
-    def cog_unload(self):
-        self.bot.slash.remove_cog_commands(self)
 
     @command(name='xp-metas', aliases=['metas', 'xpm'])
     @check_any(is_admin())
     async def metasXp(self, ctx: Context):
         """ """
-        return await Metas(ctx=ctx)
-
-    @cog_ext.cog_slash(name='xp-metas')
-    @check_any(is_admin())
-    async def _metasXp(self, ctx: SlashContext):
         return await Metas(ctx=ctx)
 
     @command(name='xp-ml', aliases=['xpml'])
@@ -38,20 +22,10 @@ class Admin(Cog):
         """ """
         return await ListaMetas(ctx=ctx)
 
-    @cog_ext.cog_slash(name='xp-ml')
-    @check_any(is_admin())
-    async def _metasLXp(self, ctx: SlashContext):
-        return await ListaMetas(ctx=ctx)
-
     @command(name='xp-mdel', aliases=['xpdel', 'xpmdel', 'xpmd'])
     @check_any(is_admin())
     async def metasDXp(self, ctx: Context):
         """ """
-        return await EliminarMeta(ctx=ctx)
-
-    @cog_ext.cog_slash(name='xp-mdel')
-    @check_any(is_admin())
-    async def _metasDXp(self, ctx: SlashContext):
         return await EliminarMeta(ctx=ctx)
 
     @command(name='xp-mcanal', aliases=['xpcanal', 'xpmcanal', 'xpmc'])
@@ -60,20 +34,10 @@ class Admin(Cog):
         """ """
         return await CanalMeta(ctx=ctx)
 
-    @cog_ext.cog_slash(name='xp-mcanal')
-    @check_any(is_admin())
-    async def _metasCXp(self, ctx: SlashContext):
-        return await CanalMeta(ctx=ctx)
-
     @command(name='xp-remove', aliases=['xpr'])
     @check_any(is_admin())
     async def removeExp(self, ctx: Context):
         """ """
-        return await RemoveExp(ctx=ctx)
-
-    @cog_ext.cog_slash(name='xp-remove')
-    @check_any(is_admin())
-    async def _removeExp(self, ctx: SlashContext):
         return await RemoveExp(ctx=ctx)
 
     @command(name='xp-add', aliases=['xpa'])
@@ -82,20 +46,10 @@ class Admin(Cog):
         """ """
         return await AddExp(ctx=ctx)
 
-    @cog_ext.cog_slash(name='xp-add')
-    @check_any(is_admin())
-    async def _addExp(self, ctx: SlashContext):
-        return await AddExp(ctx=ctx)
-
     @command(name='enablechannel', aliases=['ec'])
     @check_any(is_admin())
     async def enableChannel(self, ctx: Context):
         """ """
-        return await canalesPermitidos(ctx=ctx)
-
-    @cog_ext.cog_slash(name='enablechannel')
-    @check_any(is_admin())
-    async def _enableChannel(self, ctx: SlashContext):
         return await canalesPermitidos(ctx=ctx)
 
     @command(name='remove-enablechannel', aliases=['r-ec'])
@@ -104,20 +58,10 @@ class Admin(Cog):
         """ """
         return await quitarCanalesPermitidos(ctx=ctx)
 
-    @cog_ext.cog_slash(name='remove-enablechannel')
-    @check_any(is_admin())
-    async def _removeEnableChannel(self, ctx: SlashContext):
-        return await quitarCanalesPermitidos(ctx=ctx)
-
     @command(name='lista-enablechannel', aliases=['l-ec'])
     @check_any(is_admin())
     async def listaEnableChannel(self, ctx: Context):
         """ """
-        return await listaCanalesPermitidos(ctx=ctx)
-
-    @cog_ext.cog_slash(name='lista-enablechannel')
-    @check_any(is_admin())
-    async def _listaEnableChannel(self, ctx: SlashContext):
         return await listaCanalesPermitidos(ctx=ctx)
 
     @command(name='reset-xp')
@@ -157,5 +101,5 @@ class Admin(Cog):
         return await remove_money(ctx, user, money)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(Admin(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(Admin(bot))
