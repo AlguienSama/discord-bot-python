@@ -20,6 +20,26 @@ class Card:
 class DefendAction(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=20.0)
+    
+    @discord.ui.button(label='Defender', emoji='\U00002705', style=discord.ButtonStyle.green, custom_id='defend_action:green')
+    async def green(self, interaction: discord.Interaction, button: discord.ui.Button):
+        return 'green'
+
+    @discord.ui.button(label='Esquivar', emoji='\U000027A1', style=discord.ButtonStyle.blurple, custom_id='defend_action:blue')
+    async def blue(self, interaction: discord.Interaction, button: discord.ui.Button):
+        return 'blue'
+
+    @discord.ui.button(label='Rendirse', emoji='\U0000274C', style=discord.ButtonStyle.red, custom_id='defend_action:red')
+    async def red(self, interaction: discord.Interaction, button: discord.ui.Button):
+        return 'red'
+
+    async def on_timeout(self) -> None:
+        return await super().on_timeout()
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception, item) -> None:
+        print('Error:', error)
+        self.stop()
+        return await super().on_error(interaction, error, item)
 
 
 class Game:

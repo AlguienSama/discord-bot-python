@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord import User
 from discord.ext.commands import *
@@ -72,7 +73,7 @@ class PersistentView(discord.ui.View):
         await self.next_page(interaction)
         
     async def check_match(self):
-        if "liked" in self.curr_user and str(self.user["id"]) in self.curr_user["liked"]:
+        if "liked" in self.curr_user and str(self.user["id"]) in str(self.curr_user["liked"]):
             try:
                 user: discord.User = await self.bot.fetch_user(self.curr_user_id)
                 await user.send('**!!Nuevo match!!**')
@@ -208,9 +209,9 @@ class Tinder(Cog):
         users = []
         for _user in users_list:
             if int(_user.id) != user["id"] and not \
-                ("liked" in user and str(_user.id) in user["liked"]) and not \
-                ("rejected" in user and str(_user.id) in user["rejected"]) and not \
-                ("matched" in user and str(_user.id) in user["matched"]):
+                ("liked" in user and (str(_user.id) in user["liked"] or int(_user.id) in user["liked"])) and not \
+                ("rejected" in user and (str(_user.id) in user["rejected"] or int(_user.id) in user["rejected"])) and not \
+                ("matched" in user and (str(_user.id) in user["matched"] or int(_user.id) in user["matched"])):
                     users.append({_user.id: _user.to_dict()})
     
         if len(users) == 0:
@@ -221,6 +222,56 @@ class Tinder(Cog):
         await ctx.author.send(embed=build_profile(curr_user[curr_user_id]), view=PersistentView(self.bot, user, users, ctx.author))
         #['⬅', '❌', '✅']
         #reactions = [u'\U00002B05', u'\U0000274C', u'\U00002705']
+    
+    @command(name="deltinder")
+    async def _deltinder(self, ctx: Context):
+        """"""
+        user = await self.__get_user_data(ctx.author.id)
+        try:
+            user["id"] = ctx.author.id
+        except:
+            raise CustomError("No tienes un perfil creado `*help Tinder`")
+        await ctx.channel.send("Estás seguro de que quieres eliminar tu perfil? Escribe `confirmar` para confirmar")
+        def check(m):
+            return m.content.lower().strip() == f'confirmar' and m.channel == ctx.channel and m.author.id == ctx.author.id
+        try:
+            await self.bot.wait_for('message', check=check, timeout=60.0)
+            await tinder_delete(user)
+            await ctx.channel.send('Usuario borrado correctamente')
+        except asyncio.TimeoutError:
+            await ctx.channel.send('Time Out')
+            raise CustomError('Ha ocurrido un error borrando el usuario, contacta con <@355104003572498435> `Alguien#8623` porfavor.')
+    
+    """@command(name="tindertop")
+    async def _tindertop(self, ctx: Context):
+        users_list = (await tinder_get_list()).stream()
+        users = []
+        for _user in users_list:
+            user = _user.to_dict()
+            if "matched" in user:
+                print(_user.id + ": " + ' '.join(str(user["matched"])))
+                users.append({_user.id: len(user["matched"])})
+        print(users)"""
+    
+    """@command(name="set_match")
+    async def _set_match(self, ctx: Context):
+        """ """
+        revised = []
+        users_list = (await tinder_get_list()).stream()
+        print('users_list', users_list)
+        for _user in users_list:
+            print('REVISING USER: ' + str(_user.id))
+            user_data = _user.to_dict()
+            if "liked" in user_data:
+                for _user2 in user_data["liked"]:
+                    if int(_user2) not in revised:
+                        user2_data = (await tinder_get_user(int(_user2))).get().to_dict()
+                        if user2_data is not None:
+                            if "liked" in user2_data and (int(_user.id) in user2_data["liked"] or str(_user.id) in user2_data["liked"]):
+                                print("Match:", _user2)
+                                await tinder_match(int(_user.id), int(_user2))
+            revised.append(int(_user.id))
+            print('REVISED')"""
 
 
 async def setup(bot: Bot) -> None:

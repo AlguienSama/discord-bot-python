@@ -1,4 +1,5 @@
 from firebase_admin import firestore
+import time
 
 db = firestore.client()
 
@@ -60,3 +61,6 @@ async def tinder_match(user_id: int, user_id_matched: int):
     except:
         await tinder_set(user_id_matched, {"matched": [int(user_id)]})
         
+async def tinder_delete(user: object):
+    db.collection('tinder').document(str(user["id"])).delete()
+    return db.collection('tinder_data').document('logs').collection('deleted').document(str(round(time.time() * 1000))).set(user)
