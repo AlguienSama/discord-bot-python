@@ -1,3 +1,4 @@
+from code import interact
 import discord
 from discord.ext.commands import *
 from random import randint
@@ -40,10 +41,15 @@ class DefendAction(discord.ui.View):
         self.stop()
         await self.Game.action('surrender')
 
-    async def interaction_check(self, interacion: discord.Interaction) -> bool:
-        return interacion.user.id == self.Game.deffend.user.id
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        check = interaction.user.id == self.Game.deffend.user.id
+        if check is False:
+            await interaction.response.send_message(content=f'El defensor es **{self.Game.deffend.user}**', ephemeral=True)
+        return check
 
     async def on_timeout(self) -> None:
+        self.stop()
+        await self.Game.action('timeout')
         return await super().on_timeout()
 
     async def on_error(self, interaction: discord.Interaction, error: Exception, item) -> None:
@@ -90,9 +96,11 @@ class Game:
             dodged = self.total_damage < total_dodge
             self.last_turn_action = f'**Esquivado** con {self.deffend.dodge} + 🎲 {total_dodge - self.deffend.dodge} = **{"ÉXITO" if dodged else "FALLIDO"}**'
             self.deffend.life -= 0 if dodged else self.total_damage
-        else:
+        elif action == 'surrender':
             self.last_turn_action = F'**Rendido**'
-            self.last_turn_action = f'**Rendido**'
+            self.deffend.life = 0
+        elif action == 'timeout':
+            self.last_turn_action = F'**AFK**'
             self.deffend.life = 0
         
         if self.winner():
@@ -156,6 +164,7 @@ class AcceptGame(discord.ui.View):
     async def on_timeout(self) -> None:
         await self.channel.send(f'Tiempo de espera finalizado.')
         return await super().on_timeout()
+    
         
     @discord.ui.button(label='Aceptar', emoji='\U00002705', style=discord.ButtonStyle.green, custom_id='persistent_view:green')
     async def green(self, interaction: discord.Interaction, button: discord.ui.Button):
