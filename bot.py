@@ -1,4 +1,5 @@
 import os
+from click import help_option
 import firebase_admin
 import discord
 import time, urllib.request
@@ -27,7 +28,7 @@ errores = {
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix=os.getenv('PREFIX'), description=description, owner_ids=errores, case_insensitive=True, intents=intents)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(os.getenv('PREFIX')), description=description, owner_ids=errores, case_insensitive=True, intents=intents, help_command=None)
 
 
 @bot.event
