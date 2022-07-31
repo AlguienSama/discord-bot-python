@@ -143,7 +143,7 @@ class Game:
         return f'**💖 {user.life}**\n🗡 {user.damage}\n🛡 {user.defense}\n💨 {user.dodge}'
     
     async def end_game(self):
-        embed = Embed(title='OJ Game', description=f'{self.user1.mention} vs {self.user2.mention}\n**GANADOR: {self.attack.user.mention}** # Turno **{self.turn}**').add_field(title=f'{self.user1}', desc=self.embed_user_data(self.player1), inline=True).add_field(title=f'{self.user2}', desc=self.embed_user_data(self.player2), inline=True).add_field(title='Movimiento anterior', desc=f'Daño de **{self.attack.user}**: {self.attack.damage} + 🎲 {self.last_turn_damage-self.attack.damage}= **{self.last_turn_damage}**\nAcción de **{self.deffend.user}**: {self.last_turn_action}').success()
+        embed = Embed(title='OJ Game', description=f'{self.user1.mention} vs {self.user2.mention}\n**GANADOR: {self.attack.user.mention}** # Turno **{self.turn}**').add_field(title=f'{self.user1}', desc=self.embed_user_data(self.player1), inline=True).add_field(title=f'{self.user2}', desc=self.embed_user_data(self.player2), inline=True).add_field(title='Movimiento anterior', desc=f'Daño de **{self.attack.user}**: {self.attack.damage} + 🎲 {self.total_damage-self.attack.damage} = **{self.total_damage}**\nAcción de **{self.deffend.user}**: {self.last_turn_action}').success()
         await self.msg.edit(content=f'**{self.attack.user.mention}** gana la partida!', embed=embed.get_embed())
         
     def embed(self):
