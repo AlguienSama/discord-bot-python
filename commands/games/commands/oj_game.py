@@ -1,4 +1,3 @@
-from code import interact
 import discord
 from discord.ext.commands import *
 from random import randint
