@@ -15,8 +15,14 @@ class Card:
         self.guild = guild
     
     async def update(self):
-        oj_get_card(self.guild, self.user.id)
-        return self
+        try:
+            data = await oj_get_card(self.guild, self.user.id)
+            self.life = data['life']
+            self.damage = data['damage']
+            self.defense = data['defense']
+            self.dodge = data['dodge']
+        except:
+            return self
 
 
 class DefendAction(discord.ui.View):
