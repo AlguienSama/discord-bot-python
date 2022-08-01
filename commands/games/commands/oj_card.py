@@ -109,7 +109,6 @@ class SelectView(discord.ui.View):
 async def oj_card(ctx: commands.Context):
     """ """
     user_card = await oj_get_card(ctx.guild.id, ctx.author.id)
-    print(user_card)
     user_card = Card(ctx.guild, ctx.author, user_card)
     
     view = SelectView(user_card)
