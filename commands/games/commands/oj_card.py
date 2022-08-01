@@ -70,6 +70,9 @@ class SelectView(discord.ui.View):
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         self.interaction = interaction
+        check = interaction.user.id == self.user_card.user.id
+        if check is False:
+            await interaction.response.send_message(content=f'No puedes editar una carta que no sea tuya!', ephemeral=True)
         try:
             self.user_card.option = self.select.values[0]
             return True
