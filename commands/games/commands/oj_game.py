@@ -70,8 +70,10 @@ class Game:
         self.channel = channel
         self.user1 = player1
         self.user2 = player2
-        self.player1 = Card(guild, player1).update()
-        self.player2 = Card(guild, player2).update()
+        self.player1 = Card(guild, player1)
+        self.player1.update()
+        self.player2 = Card(guild, player2)
+        self.player2.update()
         self.attack = None
         self.deffend = None
         self.turn = 0
