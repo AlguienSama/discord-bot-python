@@ -1,19 +1,21 @@
 import discord
 from discord.ext.commands import *
 from random import randint
+from utils.ddbb.games import oj_get_card
 from utils.responses.Embed import Embed
 
 
 class Card:
-    def __init__(self, user) -> None:
+    def __init__(self, guild, user) -> None:
         self.life = 5
         self.damage = 0
         self.defense = 0
         self.dodge = 0
         self.user = user
+        self.guild = guild
     
-    def update(self):
-        # get stats from db
+    async def update(self):
+        oj_get_card(self.guild, self.user.id)
         return self
 
 
@@ -58,12 +60,12 @@ class DefendAction(discord.ui.View):
 
 
 class Game:
-    def __init__(self, player1: discord.User, player2: discord.User, channel: discord.TextChannel) -> None:
+    def __init__(self, guild: discord.Guild, player1: discord.User, player2: discord.User, channel: discord.TextChannel) -> None:
         self.channel = channel
         self.user1 = player1
         self.user2 = player2
-        self.player1 = Card(player1).update()
-        self.player2 = Card(player2).update()
+        self.player1 = Card(guild, player1).update()
+        self.player2 = Card(guild, player2).update()
         self.attack = None
         self.deffend = None
         self.turn = 0
@@ -144,7 +146,7 @@ class Game:
     
     async def end_game(self):
         embed = Embed(title='OJ Game', description=f'{self.user1.mention} vs {self.user2.mention}\n**GANADOR: {self.attack.user.mention}** # Turno **{self.turn}**').add_field(title=f'{self.user1}', desc=self.embed_user_data(self.player1), inline=True).add_field(title=f'{self.user2}', desc=self.embed_user_data(self.player2), inline=True).add_field(title='Movimiento anterior', desc=f'Daño de **{self.attack.user}**: {self.attack.damage} + 🎲 {self.total_damage-self.attack.damage} = **{self.total_damage}**\nAcción de **{self.deffend.user}**: {self.last_turn_action}').success()
-        await self.msg.edit(content=f'**{self.attack.user.mention}** gana la partida!', embed=embed.get_embed())
+        await self.msg.edit(content=f'**{self.attack.user.mention}** gana la partida!', embed=embed.get_embed(), view=None)
         
     def embed(self):
         embed = Embed(title='OJ Game', description=f'Turno: {self.turn}\nAtacante: {self.attack.user.mention}\nDefensor: {self.deffend.user.mention}').add_field(title=f'{self.user1}', desc=self.embed_user_data(self.player1), inline=True).add_field(title=f'{self.user2}', desc=self.embed_user_data(self.player2), inline=True)
@@ -155,27 +157,28 @@ class Game:
 
 
 class AcceptGame(discord.ui.View):
-    def __init__(self, author: discord.User, channel: discord.TextChannel):
+    def __init__(self, guild: discord.Guild, author: discord.User, channel: discord.TextChannel):
         super().__init__(timeout=60.0)
         self.author = author
         self.channel = channel
+        self.guild = guild
     
     async def on_timeout(self) -> None:
-        await self.channel.send(f'Tiempo de espera finalizado.')
-        return await super().on_timeout()
+        await self.msg.edit(content=f'Tiempo de espera finalizado.', view=None)
     
         
     @discord.ui.button(label='Aceptar', emoji='\U00002705', style=discord.ButtonStyle.green, custom_id='persistent_view:green')
     async def green(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user != self.author:
-            await interaction.response.edit_message(content='Vamos a empezar!')
+            await interaction.response.edit_message(content='Vamos a empezar!', view=None)
             await self.channel.send(f'{interaction.user.mention} aceptó el juego!')
             self.stop()
-            await Game(self.author, interaction.user, self.channel).start()
+            await Game(self.guild, self.author, interaction.user, self.channel).start()
         else:
             await interaction.response.send_message(content='No puedes jugar contra ti mismo!', ephemeral=True)
 
 async def oj_game(ctx: Context):
     """ """
-    await ctx.send('Esperando rival para jugar...', view=AcceptGame(ctx.author, ctx.channel))
+    view = AcceptGame(ctx.guild, ctx.author, ctx.channel)
+    view.msg = await ctx.send('Esperando rival para jugar...', view=view)
     pass

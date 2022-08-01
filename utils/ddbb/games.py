@@ -12,16 +12,15 @@ db = firestore.client()
 
 async def oj_get_card(server: int, user: int):
     try:
-        return (await __get_game__(str(server), 'oj', str(user))).to_dict()
-    except:
+        return ((await __get_game__(str(server), 'oj', str(user))).get()).to_dict()
+    except Exception as e:
         return None
 
 async def oj_set_card(server: int, user: int, data: object):
     try:
         await __set_game__(str(server), 'oj', str(user), data)
-        return True
-    except:
-        return False
+    except Exception as e:
+        print('error oj_set_card', e)
 
 
 async def start_tic_tac_toe(server: int):
