@@ -10,6 +10,19 @@ from firebase_admin import firestore
 
 db = firestore.client()
 
+async def oj_get_card(server: int, user: int):
+    try:
+        return (await __get_game__(str(server), 'oj', str(user))).to_dict()
+    except:
+        return None
+
+async def oj_set_card(server: int, user: int, data: object):
+    try:
+        await __set_game__(str(server), 'oj', str(user), data)
+        return True
+    except:
+        return False
+
 
 async def start_tic_tac_toe(server: int):
     cross = ':x:'

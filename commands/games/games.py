@@ -1,5 +1,6 @@
 from discord.ext.commands import *
 from commands.games.commands.connect_4 import conenct_4
+from commands.games.commands.oj_card import oj_card
 from commands.games.commands.oj_game import oj_game
 from commands.games.commands.tic_tac_toe import tic_tac_toe
 from commands.games.commands.battle_royale import BattleRoyale
@@ -28,6 +29,11 @@ class Games(Cog):
     async def _oj_game(self, ctx: Context):
         """ """
         return await oj_game(ctx)
+
+    @command(name='ojcard')
+    async def _oj_card(self, ctx: Context):
+        """ """
+        return await oj_card(ctx)
 
 
 async def setup(bot: Bot) -> None:
