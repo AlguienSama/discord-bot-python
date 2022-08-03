@@ -1,19 +1,17 @@
-from ast import Try
-import time
 import discord
-from discord.ext.commands import CommandInvokeError
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from .DB import __get_game__, __set_game__
-from utils.errors import CustomError, TimeError, NotMoneyError
+from .DB import __get_game__, __set_game__, __get__
+from utils.errors import CustomError
 from firebase_admin import firestore
 
 db = firestore.client()
 
 async def oj_get_card(server: int, user: int):
     try:
-        return ((await __get_game__(str(server), 'oj', str(user))).get()).to_dict()
+        return db.collection(str(server)).document('games').collection('oj').document(str(user)).get().to_dict()
     except Exception as e:
+        print('error oj_get_card', e)
         return None
 
 async def oj_set_card(server: int, user: int, data: object):

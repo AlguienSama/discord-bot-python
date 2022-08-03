@@ -16,7 +16,7 @@ class Card:
     
     async def update(self):
         try:
-            data = await oj_get_card(self.guild, self.user.id)
+            data = await oj_get_card(self.guild.id, self.user.id)
             self.life = data['life']
             self.damage = data['damage']
             self.defense = data['defense']
@@ -71,9 +71,7 @@ class Game:
         self.user1 = player1
         self.user2 = player2
         self.player1 = Card(guild, player1)
-        self.player1.update()
         self.player2 = Card(guild, player2)
-        self.player2.update()
         self.attack = None
         self.deffend = None
         self.turn = 0
@@ -84,9 +82,14 @@ class Game:
         self.last_turn_action = None
     
     async def start(self):
+        if self.turn == 0:
+            await self.player1.update()
+            await self.player2.update()
         self.set_turn()
         self.last_turn_damage = self.total_damage
         self.total_damage = self.attack.damage + self.rand_dice()
+        if self.total_damage <= 0:
+            self.total_damage = 1
         if self.msg is None:
             self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         else:
@@ -104,7 +107,7 @@ class Game:
             total_dodge = self.deffend.dodge + self.rand_dice()
             dodged = self.total_damage < total_dodge
             self.last_turn_action = f'**Esquivado** con {self.deffend.dodge} + 🎲 {total_dodge - self.deffend.dodge} = **{"ÉXITO" if dodged else "FALLIDO"}**'
-            self.deffend.life -= 0 if dodged else self.total_damage
+            self.deffend.life -= 0 if dodged else self.total_damage if self.total_damage > 0 else 1
         elif action == 'surrender':
             self.last_turn_action = F'**Rendido**'
             self.deffend.life = 0
@@ -143,8 +146,10 @@ class Game:
     
     def winner(self):
         if self.player1.life <= 0:
+            self.player1.life = 0
             return self.player2
         elif self.player2.life <= 0:
+            self.player2.life = 0
             return self.player1
         else:
             return False

@@ -85,7 +85,6 @@ class SelectView(discord.ui.View):
     @discord.ui.button(label='Sumar', emoji='\U00002B06', style=discord.ButtonStyle.gray, custom_id='select_view:grey')
     async def up(self, interaction: discord.Interaction, button: discord.ui.Button):
         attr = getattr(self.user_card, self.user_card.option)
-        print(self.user_card.option)
         if self.user_card.option == 'life' and self.user_card.life >= 7 or (self.user_card.option != 'life' and attr >= 2):
             await interaction.response.send_message(content='No puedes sumar más puntos en la opción', ephemeral=True)
         elif self.user_card.restant_points() <= 0:
