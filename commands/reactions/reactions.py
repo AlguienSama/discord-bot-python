@@ -88,7 +88,6 @@ class Reacciones(Cog):
             if type(prefix) is list:
                 return
             command = message.content.split(prefix)[1].split(' ')[0]
-            print('command', command)
             return await Command(message=message, nombre=command)
         except Exception as e:
             print(e)
