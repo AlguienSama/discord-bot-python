@@ -76,18 +76,23 @@ class Reacciones(Cog):
     async def on_message(self, message):
         if not await _is_enabled_channel(message):
             return
-
         if message.author.id == self.bot.user.id or message.author.bot:
             return
 
-        n_comando = " ".join(message.content.split(" ")[:1])
-
-        if len(n_comando) > 0 and n_comando[0] == self.bot.command_prefix:
-            n_comando = n_comando[1:]
-        else:
+        try:
+            prefix = await self.bot.get_prefix(message)
+            for p in prefix:
+                if message.content.startswith(p):
+                    prefix = p
+                    break
+            if type(prefix) is list:
+                return
+            command = message.content.split(prefix)[1].split(' ')[0]
+            print('command', command)
+            return await Command(message=message, nombre=command)
+        except Exception as e:
+            print(e)
             return
-
-        return await Command(message=message, nombre=n_comando)
 
 async def setup(bot: Bot) -> None:
     await bot.add_cog(Reacciones(bot))
