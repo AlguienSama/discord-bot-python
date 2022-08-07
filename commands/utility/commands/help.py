@@ -98,7 +98,7 @@ class Help(commands.HelpCommand):
                 return cog.get_commands()
     
     
-    def get_embed(self, category: str) -> discord.Embed:
+    def get_embed(self, category: str = None) -> discord.Embed:
         embed = Embed(title=f'Ayuda {f"- {category}" if category is not None else ""}', color=0x00ff00)
         if category is None:
             embed.description = 'Aquí encontrarás todos los comandos disponibles!'
