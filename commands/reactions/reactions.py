@@ -6,70 +6,40 @@ class Reacciones(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    # @command(name='hug')
+    # @command(name='hug', description="Dar un abrazo")
     # @check_any(is_enabled_channel())
     # async def hug(self, ctx: Context):
     #     """ """
     #     return await Comando(ctx=ctx, nombre='hug', descripcion=' hugged ')
     #
-    # @cog_ext.cog_slash(name="hug")
-    # @check_any(is_enabled_channel())
-    # async def _hug(self, ctx: SlashContext):
-    #     return await Comando(ctx=ctx, nombre='hug', descripcion=' hugged ')
-    #
-    # @command(name='lick')
+    # @command(name='lick', description="Lamer")
     # @check_any(is_enabled_channel())
     # async def lick(self, ctx: Context):
     #     """ """
     #     return await Comando(ctx=ctx, nombre='lick', descripcion=' licked ')
     #
-    # @cog_ext.cog_slash(name="lick")
-    # @check_any(is_enabled_channel())
-    # async def _lick(self, ctx: SlashContext):
-    #     return await Comando(ctx=ctx, nombre='lick', descripcion=' licked ')
-    #
-    # @command(name='felicidades', aliases=['congrats', 'congratulations'])
+    # @command(name='felicidades', aliases=['congrats', 'congratulations'], description="Felicitar")
     # @check_any(is_enabled_channel())
     # async def felicidades(self, ctx: Context):
     #     """ """
     #     return await Comando(ctx=ctx, nombre='felicidades', descripcion=' felicitó a ')
     #
-    # @cog_ext.cog_slash(name="felicidades")
-    # @check_any(is_enabled_channel())
-    # async def _felicidades(self, ctx: SlashContext):
-    #     return await Comando(ctx=ctx, nombre='felicidades', descripcion=' felicitó a ')
-    #
-    # @command(name='echaragua')
+    # @command(name='echaragua', description="Echar agua")
     # @check_any(is_enabled_channel())
     # async def echaragua(self, ctx: Context):
     #     """ """
     #     return await Comando(ctx=ctx, nombre='echaragua', descripcion=' ha mojado a ')
     #
-    # @cog_ext.cog_slash(name="echaragua")
-    # @check_any(is_enabled_channel())
-    # async def _echaragua(self, ctx: SlashContext):
-    #     return await Comando(ctx=ctx, nombre='echaragua', descripcion=' ha mojado a ')
-    #
-    # @command(name='felizcumple')
+    # @command(name='felizcumple', aliases=['happybirthday', 'happybirthday'], description="Desear feliz cumpleaños")
     # @check_any(is_enabled_channel())
     # async def felizcumple(self, ctx: Context):
     #     """ """
     #     return await Comando(ctx=ctx, nombre='felizcumple', descripcion=' felicitó a ')
     #
-    # @cog_ext.cog_slash(name="felizcumple")
-    # @check_any(is_enabled_channel())
-    # async def _felizcumple(self, ctx: SlashContext):
-    #     return await Comando(ctx=ctx, nombre='felizcumple', descripcion=' felicitó a ')
-    #
-    # @command(name='nalgada')
+    # @command(name='nalgada', description="Dar una nalgada")
     # @check_any(is_enabled_channel())
     # async def nalgada(self, ctx: Context):
     #     """ """
-    #     return await Comando(ctx=ctx, nombre='nalgada', descripcion=' le dio unas buenas nalgadas a ')
-    #
-    # @cog_ext.cog_slash(name="nalgada")
-    # @check_any(is_enabled_channel())
-    # async def _nalgada(self, ctx: SlashContext):
     #     return await Comando(ctx=ctx, nombre='nalgada', descripcion=' le dio unas buenas nalgadas a ')
 
     @Cog.listener()

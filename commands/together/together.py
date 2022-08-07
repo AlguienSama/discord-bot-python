@@ -16,7 +16,7 @@ class Together(Cog):
         return await youtube_together(ctx, channel)
 
     @command(name='poker-together',
-             description='Poker',
+             description='Poker para jugar en el chat de voz',
              help='poker-together <voice channel>')
     @check_any(is_enabled_channel())
     async def _poker_together(self, ctx: Context, channel):
@@ -24,7 +24,7 @@ class Together(Cog):
         return await poker_together(ctx, channel)
 
     @command(name='betrayal-together',
-             description='Como el among us',
+             description='Como el among us pero para el chat de voz',
              help='betrayal-together <voice channel>')
     @check_any(is_enabled_channel())
     async def _betrayal_together(self, ctx: Context, channel):
@@ -41,7 +41,7 @@ class Together(Cog):
 
     @command(name='chess-together',
              aliases=['ajedrez'],
-             description='Jugar al ajedrez en el chat de voz',
+             description='Jugar al ajedrez desde el chat de voz',
              help='chess-together <voice channel>')
     @check_any(is_enabled_channel())
     async def _chess_together(self, ctx: Context, channel):

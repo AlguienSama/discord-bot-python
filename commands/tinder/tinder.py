@@ -136,43 +136,43 @@ class Tinder(Cog):
             await user.send(msg)
     
     
-    @command(name='tnombre')
+    @command(name='tnombre', aliases=['tname'], description="Cambia tu nombre")
     async def _tinder_name(self, ctx: Context, *, name: str):
         """<nombre>"""
         await tinder_set_name(ctx.author.id, name)
         await self._tinder_profile(ctx)
     
-    @command(name='tgenero')
+    @command(name='tgenero', aliases=['tgender'], description="Cambia tu género")
     async def _tinder_gender(self, ctx: Context, *, gender: str):
         """<género femenino / masculino / ...>"""
         await tinder_set_gender(ctx.author.id, gender)
         await self._tinder_profile(ctx)
     
-    @command(name='timagen')
+    @command(name='timagen', aliases=['timage'], description="Cambia tu imagen")
     async def _tinder_image(self, ctx: Context, image: str):
         """<url imagen>"""
         await tinder_set_image(ctx.author.id, image)
         await self._tinder_profile(ctx)
     
-    @command(name='tdesc')
+    @command(name='tdesc', aliases=['tdescription'], description="Cambia tu descripción")
     async def _tinder_description(self, ctx: Context, *, description: str):
         """<descripción>"""
         await tinder_set_description(ctx.author.id, description)
         await self._tinder_profile(ctx)
     
-    @command(name='thobbies')
+    @command(name='thobbies', aliases=['thobby'], description="Cambia tus hobbies")
     async def _tinder_hobbies(self, ctx: Context, *, hobbies: str):
         """<lista de hobbies>"""
         await tinder_set_hobbies(ctx.author.id, hobbies)
         await self._tinder_profile(ctx)
         
-    @command(name='tfrase')
+    @command(name='tfrase', aliases=['tphrase'], description="Cambia tu frase")
     async def _tinder_phrase(self, ctx: Context, *, phrase: str):
         """<frase para conquistar a la gente o no se, ilústrense>"""
         await tinder_set_phrase(ctx.author.id, phrase)
         await self._tinder_profile(ctx)
         
-    @command(name='tcolor')
+    @command(name='tcolor', description="Cambia tu color")
     async def _tinder_color(self, ctx: Context, color: str):
         """<color en hexadecimal (ej: #00f0ff)>"""
         try:
@@ -185,7 +185,7 @@ class Tinder(Cog):
         await tinder_set_color(ctx.author.id, color)
         await self._tinder_profile(ctx)
     
-    @command(name='tperfil')
+    @command(name='tperfil', aliases=['tprofile'], description="Muestra tu perfil")
     async def _tinder_profile(self, ctx: Context):
         """Ver tu perfil"""
         try:
@@ -197,7 +197,7 @@ class Tinder(Cog):
             print(e)
             raise CustomError("No tienes un perfil creado `*help Tinder`")
     
-    @command(name="tinder")
+    @command(name="tinder", description="Ver los otros perfiles")
     async def _tinder(self, ctx: Context):
         """"""        
         user = await self.__get_user_data(ctx.author.id)
@@ -223,7 +223,7 @@ class Tinder(Cog):
         #['⬅', '❌', '✅']
         #reactions = [u'\U00002B05', u'\U0000274C', u'\U00002705']
     
-    @command(name="deltinder")
+    @command(name="deltinder", description="Elimina tu perfil")
     async def _deltinder(self, ctx: Context):
         """"""
         user = await self.__get_user_data(ctx.author.id)
@@ -242,16 +242,15 @@ class Tinder(Cog):
             await ctx.channel.send('Time Out')
             raise CustomError('Ha ocurrido un error borrando el usuario, contacta con <@355104003572498435> `Alguien#8623` porfavor.')
     
-    """@command(name="tindertop")
+    """ @command(name="tindertop")
     async def _tindertop(self, ctx: Context):
         users_list = (await tinder_get_list()).stream()
         users = []
         for _user in users_list:
             user = _user.to_dict()
             if "matched" in user:
-                print(_user.id + ": " + ' '.join(str(user["matched"])))
                 users.append({_user.id: len(user["matched"])})
-        print(users)"""
+        print(users) """
     
     """@command(name="set_match")
     async def _set_match(self, ctx: Context):

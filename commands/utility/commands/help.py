@@ -51,7 +51,7 @@ class Help(commands.HelpCommand):
     async def send_bot_help(self, mapping, /) -> None:
         print('send_bot_help')
         self.get_command_list(mapping)
-        await self.get_destination().send(embed=self.get_embed('Admin'), view=HelpView(self, self.commands))
+        await self.get_destination().send(embed=self.get_embed(), view=HelpView(self, self.commands))
         return await super().send_bot_help(mapping)
     
     # With command
@@ -62,6 +62,9 @@ class Help(commands.HelpCommand):
     # With cog
     async def send_cog_help(self, cog: Cog, /) -> None:
         print('send_cog_help')
+        print('cog', cog)
+        self.get_command_list(self.get_bot_mapping())
+        await self.get_destination().send(embed=self.get_embed(Cog), view=HelpView(self, self.commands))
         return await super().send_cog_help(cog)
     
     # Error message
@@ -89,6 +92,8 @@ class Help(commands.HelpCommand):
     def get_cog_commands(self, category: str):
         commands = self.get_bot_mapping()
         for cog in commands:
+            if cog == None:
+                continue
             if cog.qualified_name == category:
                 return cog.get_commands()
     

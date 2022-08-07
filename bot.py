@@ -69,7 +69,6 @@ async def load_commands():
     await load_extensions('./commands/moderation')
     await load_extensions('./commands/music')
     await load_extensions('./commands/reactions')
-    await load_extensions('./commands/settings')
     await load_extensions('./commands/together')
     await load_extensions('./commands/utility')
     await load_extensions('./commands/tinder')

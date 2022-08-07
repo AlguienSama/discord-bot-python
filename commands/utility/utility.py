@@ -12,7 +12,7 @@ class Utiles(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @command(name='ping')
+    @command(name='ping', description="Envía un ping al servidor")
     @check_any(is_enabled_channel())
     async def ping(self, ctx: Context):
         """Ping del bot al host de discord"""
@@ -30,55 +30,55 @@ class Utiles(Cog):
 
         return await experiencia(message)
 
-    @command(name='xp')
+    @command(name='xp', description="Ver la experiencia de un usuario")
     @check_any(is_enabled_channel())
     async def xp(self, ctx: Context):
         """ """
         return await getExp(ctx=ctx)
 
-    @command(name='rank')
+    @command(name='rank', description="Ver el ranking de experiencia en el servidor")
     @check_any(is_enabled_channel())
     async def _rank_xp(self, ctx: Context):
         """ """
         return await rank_xp(self.bot, ctx=ctx)
 
-    @command(name='colorear')
+    @command(name='colorear', description="Colorear una imagen")
     @check_any(is_enabled_channel())
     async def _colorizer(self, ctx: Context, link):
         """ """
         return await colorizer(ctx=ctx, link=link)
 
-    @command(name='super_resolution')
+    @command(name='super_resolution', description="Aumentar la resolución de una imagen")
     @check_any(is_enabled_channel())
     async def _super_resolution(self, ctx: Context, link):
         """ """
         return await super_resolution(ctx=ctx, link=link)
 
-    @command(name='waifu2x')
+    @command(name='waifu2x', description="Aumentar la resolución de una imagen")
     @check_any(is_enabled_channel())
     async def _waifu2x(self, ctx: Context, link):
         """ """
         return await waifu2x(ctx=ctx, link=link)
 
-    @command(name='text2image')
+    @command(name='text2image', description="Aumentar la resolución de una imagen")
     @check_any(is_enabled_channel())
     async def _text_to_image(self, ctx: Context, *args):
         """ """
         return await text_to_image(ctx=ctx, args=args)
 
-    @command(name='toonify')
+    @command(name='toonify', description="Editar una imagen con IA")
     @check_any(is_enabled_channel())
     async def _toonify(self, ctx: Context, link):
         """ """
         return await toonify(ctx=ctx, link=link)
 
-    @command(name='say')
+    @command(name='say', description="Hacer que el bot diga algo")
     @check_any(is_enabled_channel(), is_owner())
     async def _say(self, ctx: Context, *, message=None):
         """ """
         return await say(ctx=ctx, message=message)
 
-    @command(name='server', alias=['server_info'])
+    @command(name='server', alias=['server_info'], description="Información del servidor")
     @check_any(is_enabled_channel())
     async def _server(self, ctx: Context):
         """ """
