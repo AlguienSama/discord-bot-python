@@ -1,3 +1,4 @@
+from discord import Forbidden
 from discord.ext.commands import *
 from datetime import datetime
 from utils.responses.Embed import Embed
@@ -52,8 +53,7 @@ async def errors(ctx: Context, error):
 
     elif isinstance(error, MissingRequiredArgument):
         embed.description = '**{}** es un argumento requerido'.format(error.param)
-        embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name,
-                                                        ctx.command.help))
+        embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
 
     elif isinstance(error, MissingPermissions):
         print(error.missing_perms)
@@ -87,6 +87,9 @@ async def errors(ctx: Context, error):
     elif isinstance(error, CustomError):
         embed.description = error.error
 
+    elif isinstance(error, Forbidden):
+        embed.description = 'Permisos insuficientes para enviar el mensaje'
+
     elif isinstance(error, CommandInvokeError):
 
         if isinstance(error.original, ValueError):
@@ -97,7 +100,11 @@ async def errors(ctx: Context, error):
         elif isinstance(error.original, NoneType):
             embed.description = f'Debes de introducir los parámetros correctamente'
 
+        elif isinstance(error.original, Forbidden):
+            embed.description = 'Permisos insuficientes para enviar el mensaje'
+
         else:
+            print(' ---- ERROR ----')
             print(type(error))
             print(error)
             print(error.args)
