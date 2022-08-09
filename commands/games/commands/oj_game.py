@@ -4,6 +4,7 @@ from random import randint
 from utils.ddbb.games import oj_get_card
 from utils.responses.Embed import Embed
 
+moeru = 800480469678162011
 
 class Card:
     def __init__(self, guild, user) -> None:
@@ -15,6 +16,8 @@ class Card:
         self.guild = guild
     
     async def update(self):
+        if self.user.id == moeru:
+            return self.set_ai_data()
         try:
             data = await oj_get_card(self.guild.id, self.user.id)
             self.life = data['life']
@@ -23,6 +26,44 @@ class Card:
             self.dodge = data['dodge']
         except:
             return self
+    
+    def restant_points(self):
+        return 6 - self.life - self.damage - self.defense - self.dodge
+
+    def set_ai_data(self):
+        props = ['life', 'damage', 'defense', 'dodge']
+        
+        def plus():
+            prop = props[randint(0, 3)]
+            if prop == 'life' and self.life >= 7:
+                plus()
+            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) > 2:
+                plus()
+            val = getattr(self, prop)
+            setattr(self, prop, val + 1)
+            if self.restant_points() > 0:
+                plus()
+            return
+        def minus():
+            prop = props[randint(0, 3)]
+            if prop == 'life' and self.life <= 3:
+                minus()
+            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) < -2:
+                minus()
+            val = getattr(self, prop)
+            setattr(self, prop, val - 1)
+            if self.restant_points() < 0:
+                minus()
+            return
+        
+        for i in range(4):
+            val = getattr(self, props[i])
+            setattr(self, props[i], val + randint(-2, 2))
+        if self.restant_points() > 0:
+            plus()
+        elif self.restant_points() < 0:
+            minus()
+        return self
 
 
 class DefendAction(discord.ui.View):
@@ -90,7 +131,13 @@ class Game:
         self.total_damage = self.attack.damage + self.rand_dice()
         if self.total_damage <= 0:
             self.total_damage = 1
-        if self.msg is None:
+        if self.deffend == self.player2:
+            await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
+            if self.total_damage-self.player2.defense > 3:
+                await self.action('defend')
+            else:
+                await self.action('dodge')
+        elif self.msg is None:
             self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         else:
             await self.msg.edit(embed=self.embed(), view=DefendAction(self))
@@ -126,7 +173,11 @@ class Game:
     
     def set_turn(self):
         if self.turn_calc == 0:
-            self.turn_calc = randint(1, 2)
+            if self.player2.user.id == moeru:
+                self.attack = self.player2
+                self.deffend = self.player1
+            else:
+                self.turn_calc = randint(1, 2)
         if self.turn_calc == 1:
             self.turn_calc = 2
             self.attack = self.player1
@@ -189,6 +240,17 @@ class AcceptGame(discord.ui.View):
             await Game(self.guild, self.author, interaction.user, self.channel).start()
         else:
             await interaction.response.send_message(content='No puedes jugar contra ti mismo!', ephemeral=True)
+    
+    @discord.ui.button(label='VS Moeru', style=discord.ButtonStyle.secondary, custom_id='persistent_view:blue')
+    async def vs_ui(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user == self.author:
+            await interaction.response.edit_message(content='Vamos a empezar!', view=None)
+            user = await self.guild.fetch_member(moeru)
+            await self.channel.send(f'Partida contra {user.mention}!')
+            self.stop()
+            await Game(self.guild, self.author, user, self.channel).start()
+        else:
+            await interaction.response.send_message(content='No puedes seleccionar esta opción!', ephemeral=True)
 
 async def oj_game(ctx: Context):
     """ """
