@@ -1,3 +1,4 @@
+import time
 import discord
 from discord.ext.commands import *
 from random import randint
@@ -58,7 +59,10 @@ class Card:
         
         for i in range(4):
             val = getattr(self, props[i])
-            setattr(self, props[i], val + randint(-2, 2))
+            rand = randint(-2, 2)
+            if props[i] == 'damage' and rand < 0:
+                rand = 1
+            setattr(self, props[i], val + rand)
         if self.restant_points() > 0:
             plus()
         elif self.restant_points() < 0:
@@ -133,14 +137,15 @@ class Game:
             self.total_damage = 1
         if self.deffend == self.player2:
             await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
-            if self.total_damage-self.player2.defense > 3:
-                await self.action('defend')
-            else:
+            time.sleep(5)
+            if self.total_damage - self.player2.dodge <= 3:
                 await self.action('dodge')
+            else:
+                await self.action('defend')
         elif self.msg is None:
             self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         else:
-            await self.msg.edit(embed=self.embed(), view=DefendAction(self))
+            await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
     
     async def action(self, action):
         if action == 'defend':
