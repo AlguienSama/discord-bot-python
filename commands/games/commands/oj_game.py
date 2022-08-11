@@ -38,7 +38,7 @@ class Card:
             prop = props[randint(0, 3)]
             if prop == 'life' and self.life >= 7:
                 plus()
-            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) > 2:
+            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) >= 2:
                 plus()
             val = getattr(self, prop)
             setattr(self, prop, val + 1)
@@ -49,7 +49,7 @@ class Card:
             prop = props[randint(0, 3)]
             if prop == 'life' and self.life <= 3:
                 minus()
-            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) < -2:
+            elif (prop == 'damage' or prop == 'defense' or prop == 'dodge') and getattr(self, prop) <= -2:
                 minus()
             val = getattr(self, prop)
             setattr(self, prop, val - 1)
@@ -150,6 +150,8 @@ class Game:
     async def action(self, action):
         if action == 'defend':
             total_defense = self.deffend.defense + self.rand_dice()
+            if total_defense <= 0:
+                total_defense = 1
             damage = self.total_damage - total_defense
             self.last_turn_action = f'**Defendido** con {self.deffend.defense} + 🎲 {total_defense - self.deffend.defense} = **{total_defense}**'
             realized_damage = damage if damage > 0 else 1
