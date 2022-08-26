@@ -135,13 +135,16 @@ class Game:
         self.total_damage = self.attack.damage + self.rand_dice()
         if self.total_damage <= 0:
             self.total_damage = 1
-        if self.deffend == self.player2:
-            await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
-            time.sleep(5)
-            if self.total_damage - self.player2.dodge <= 3:
-                await self.action('dodge')
-            else:
-                await self.action('defend')
+        if self.player2.user.id == moeru:
+            if self.deffend == self.player2:
+                await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
+                time.sleep(5)
+                if self.total_damage - self.player2.dodge <= 3:
+                    await self.action('dodge')
+                else:
+                    await self.action('defend')
+            elif self.msg is None:
+                self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         elif self.msg is None:
             self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         else:
