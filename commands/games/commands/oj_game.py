@@ -140,9 +140,11 @@ class Game:
                 if self.msg is None:
                     self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
                 else:
-                    await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
+                    await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
                 time.sleep(5)
                 if self.total_damage - self.player2.dodge <= 3:
+                    await self.action('dodge')
+                if self.player2.life == 1:
                     await self.action('dodge')
                 else:
                     await self.action('defend')
@@ -150,7 +152,7 @@ class Game:
                 if self.msg is None:
                     self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
                 else:
-                    await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed())
+                    await self.msg.edit(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         elif self.msg is None:
             self.msg = await self.channel.send(content=f'Defensor: {self.deffend.user.mention}', embed=self.embed(), view=DefendAction(self))
         else:
