@@ -74,23 +74,27 @@ class DefendAction(discord.ui.View):
     def __init__(self, game):
         super().__init__(timeout=20.0)
         self.Game = game
+        self.end = False
     
     @discord.ui.button(label='Defender', emoji='\U0001F6E1', style=discord.ButtonStyle.green, custom_id='defend_action:green')
     async def green(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         self.stop()
+        self.end = True
+        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         await self.Game.action('defend')
 
     @discord.ui.button(label='Esquivar', emoji='\U0001F4A8', style=discord.ButtonStyle.blurple, custom_id='defend_action:blue')
     async def blue(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         self.stop()
+        self.end = True
+        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         await self.Game.action('dodge')
 
     @discord.ui.button(label='Rendirse', emoji='\U00002716', style=discord.ButtonStyle.red, custom_id='defend_action:red')
     async def red(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         self.stop()
+        self.end = True
+        await interaction.response.edit_message(content=f'Defensor: {self.Game.attack.user.mention}')
         await self.Game.action('surrender')
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -101,12 +105,14 @@ class DefendAction(discord.ui.View):
 
     async def on_timeout(self) -> None:
         self.stop()
-        await self.Game.action('timeout')
+        if not self.end:
+            await self.Game.action('timeout')
         return await super().on_timeout()
 
     async def on_error(self, interaction: discord.Interaction, error: Exception, item) -> None:
         print('Error:', error)
         self.stop()
+        self.end = True
         return await super().on_error(interaction, error, item)
 
 
