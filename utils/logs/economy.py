@@ -6,8 +6,10 @@ from utils.ddbb.DB import __get__, __set__
 
 
 async def _send(ctx: Context, embed: discord.Embed):
-    channel = 782309852910977154  # TODO: DDBB query
+    channel = 649003749439701012  # TODO: DDBB query
     try:
+        if ctx.guild.id == 782035590501498900:
+            channel = 945371397847404554
         await ctx.guild.get_channel(channel).send(embed=embed)
     except:
         # Para pruebas en otros servers hasta que no se tenga la ddbb lista
@@ -24,15 +26,13 @@ async def _send(ctx: Context, embed: discord.Embed):
 
 async def win_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}') \
-        .success()
+    embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}').success()
 
     await _send(ctx, embed.get_embed())
 
 
 async def lose_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal_negative(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}') \
-        .failure()
+    embed = Embed(title=type, user=user, description=f'{user.id} ha perdido {money} en el canal {ctx.channel.id}').failure()
 
     await _send(ctx, embed.get_embed())

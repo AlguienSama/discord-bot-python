@@ -75,8 +75,8 @@ class Roulette(threading.Thread):
 async def join_roulette(bot: Bot, ctx: Context, money: int, args):
     try:
         money = int(money)
-        if money < 1:
-            raise MoneyError(min=1)
+        if money < 100:
+            raise MoneyError(min=100)
     except:
         raise CustomError('Invalid Ammount')
 
@@ -111,10 +111,12 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
             continue
         if check_bet(arg, colors, 'color'):
             continue
-    
+
+    if bet['v'] == 0:
+        raise CustomError('A que quieres apostar')
     bet['total_ammount'] = bet['ammount']*bet['v']
-    #await check_bal(ctx.guild.id, ctx.author.id, bet['total_ammount'])
-    #await lose_money(ctx.guild.id, ctx.author.id, bet['total_ammount'], 'Ruleta')
+    await check_bal(ctx.guild.id, ctx.author.id, bet['total_ammount'])
+    await lose_money(ctx, ctx.author, bet['total_ammount'], 'Ruleta')
     
     """ for thread in threading.enumerate():
         if thread.name == f'roulette_{ctx.guild.id}':
@@ -164,16 +166,17 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
         embed = Embed(title='Ruleta', user=ctx.author, description=f"**{games[f'{ctx.channel.id}']['time'] - int(round(time.time()))} segundos** restantes")
         embed.warn().add_field(title='Apuestas', desc=desc)
         await ctx.channel.send(embed=embed.get_embed())
-        
+
     try:
         games[f'{ctx.channel.id}']['bets'].append(bet)
         await send_message()
     except:
+        WAIT_SECONDS = 30
         games = {}
-        games[f'{ctx.channel.id}'] = {'guild': ctx.guild.id, 'channel': ctx.channel.id, 'creator': ctx.author.id, 'time': int(round(time.time())) + 10, 'bets': []}
+        games[f'{ctx.channel.id}'] = {'guild': ctx.guild.id, 'channel': ctx.channel.id, 'creator': ctx.author.id, 'time': int(round(time.time())) + WAIT_SECONDS, 'bets': []}
         games[f'{ctx.channel.id}']['bets'].append(bet)
         await send_message()
-        await asyncio.sleep(10)
+        await asyncio.sleep(WAIT_SECONDS)
         game = games[f'{ctx.channel.id}']
         del games[f'{ctx.channel.id}']
         num = random.randint(0, 36)
@@ -209,6 +212,8 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
             
             user_id = str(bet['user'])
             if ammount != 0:
+                user = await bot.fetch_user(int(user_id))
+                await win_money(ctx=ctx, user=user, money=ammount, type='Roulette')
                 if user_id in wins:
                     wins[user_id] += ammount
                 else:

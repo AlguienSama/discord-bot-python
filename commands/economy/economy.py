@@ -36,7 +36,7 @@ class Economy(Cog):
 
     @command(name='roulette', aliases=['ruleta', 'r'], description="Ruleta del casino")
     async def _join_roulette(self, ctx: Context, money: int, *args):
-        """ """
+        """roulette <dinero> [número del 0 al 36 incluidos] [par | impar] [1-18 | 19-36] [1st | 2nd | 3rd] [r1 | r2 | r3] [rojo | negro]"""
         return await join_roulette(self.bot, ctx, money, args)
 
 
