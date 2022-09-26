@@ -1,9 +1,7 @@
 import random
-import datetime
 from discord.ext.commands import Context
 from utils.ddbb.economy import update_work
 from utils.responses.Embed import Embed
-from utils.errors import TimeError
 
 
 async def work(ctx: Context):

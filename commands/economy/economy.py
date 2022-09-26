@@ -3,6 +3,7 @@ from .commands.balance import balance
 from .commands.work import work
 from .commands.casino import *
 from .commands.haikoins import *
+from .commands.shop_items import *
 
 
 class Economy(Cog):
@@ -27,6 +28,16 @@ class Economy(Cog):
     async def _haikoin(self, ctx: Context, user=None):
         """ """
         return await get_haikoin(ctx, user)
+
+    @command(name='item-create', description="Crear un objeto")
+    async def _create_item(self, ctx: Context):
+        """ """
+        return await item_create(ctx)
+
+    @command(name='roulette', aliases=['ruleta', 'r'], description="Ruleta del casino")
+    async def _join_roulette(self, ctx: Context, money: int, *args):
+        """ """
+        return await join_roulette(self.bot, ctx, money, args)
 
 
 async def setup(bot: Bot) -> None:

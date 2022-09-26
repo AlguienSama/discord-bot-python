@@ -7,31 +7,236 @@ from utils.responses.Embed import Embed
 from utils.errors import CustomError
 
 
-def build_profile(user) -> discord.Embed:
+class Profile():
+    def __init__(self, user: User):
+        self.user = user
+        self.name = None
+        self.gender = None
+        self.sex_preference = None
+        self.age = None
+        self.image = None
+        self.description = None
+        self.hobbies = None
+        self.color = '#ffffff'
+
+    async def get_user_data(self):
+        doc_ref = await tinder_get_user(self.user.id)
+        user_data = doc_ref.get()
+        if user_data is not None:
+            user_data = user_data.to_dict()
+            self.age = user_data['age'] if 'age' in user_data else None
+            self.color = user_data['color'] if 'color' in user_data else '#bf4035'
+            self.description = user_data['description'] if 'description' in user_data else None
+            self.gender = user_data['gender'] if 'gender' in user_data else None
+            self.hobbies = user_data['hobbies'] if 'hobbies' in user_data else None
+            self.image = user_data['image'] if 'image' in user_data else None
+            self.name = user_data['name'] if 'name' in user_data else None
+            self.sex_preference = user_data['sex_preference'] if 'sex_preference' in user_data else None
+        return self
+            
+    async def save(self):
+        await tinder_set(self.user.id, {'age': self.age, 'color': self.color, 'description': self.description, 'gender': self.gender, 'hobbies': self.hobbies, 'image': self.image, 'name': self.name, 'sex_preference': self.sex_preference})
+        pass
+
+
+def build_profile(user: Profile) -> discord.Embed:
     embed = Embed()
-    if "name" in user:
-        embed.title = user["name"]
-    if "gender" in user:
-        if embed.title is None:
-            embed.title = f'[{user["gender"]}]'
-        else:
-            embed.title += f' [{user["gender"]}]'
-    if "image" in user:
-        embed.set_image(user["image"])
-    if "description" in user:
-        embed.description = user["description"]
-    if "hobbies" in user:
-        embed.add_field('Hobbies', user["hobbies"])
-    if "color" in user:
-        try:
-            color = user["color"].split('#')
-            color = color[1] if color[1] is not None else color[0]
-            embed.color = int('0x'+color, base=16)
-        except:
-            embed.color = int(user["color"])
-    if "phrase" in user:
-        embed.set_author(user["phrase"], "")
+    embed.title = user.name
+    if embed.title is None:
+        embed.title = f'[{user.gender}]'
+    else:
+        embed.title += f' [{user.gender}]'
+    embed.set_image(user.image)
+    embed.description = user.description
+    embed.add_field('Hobbies', user.hobbies)
+    try:
+        color = user.color.split('#')
+        color = color[1] if color[1] is not None else color[0]
+        embed.color = int('0x'+color, base=16)
+    except:
+            embed.color = int(user.color)
     return embed.get_embed()
+
+
+class TinderModal(discord.ui.Modal):
+    def __init__(self, profile: Profile):
+        super().__init__(title="Tinder")
+        self.profile = profile
+        self.age = discord.ui.TextInput(label="Edad (número)", style=discord.TextStyle.short, placeholder="Edad", required=True, min_length=1, max_length=2, default='' if not hasattr(profile, 'age') else profile.age)
+        self.description = discord.ui.TextInput(label="Descripción", style=discord.TextStyle.long, placeholder="Descripción", required=False, default='' if not hasattr(profile, 'description') else profile.description)
+        self.gender = discord.ui.Select(placeholder="Género", options=[
+            discord.SelectOption(label='Hombre', value='Hombre', default=True if profile.gender == 'Hombre' else False),
+            discord.SelectOption(label='Mujer', value='Mujer', default=True if profile.gender == 'Mujer' else False),
+            discord.SelectOption(label='Otro', value='Otro', default=True if profile.gender == 'Otro' else False)
+        ], min_values=1, max_values=1)
+        self.name = discord.ui.TextInput(label="Nombre", style=discord.TextStyle.short, placeholder="Nombre", min_length=1, max_length=50, required=True, default='' if not hasattr(profile, 'name') else profile.name)
+        self.sex_preference = discord.ui.Select(placeholder="Que buscas?", options=[
+            discord.SelectOption(label='Hombres', value='Hombre', default=True if profile.gender == 'Hombre' else False),
+            discord.SelectOption(label='Mujeres', value='Mujer', default=True if profile.gender == 'Mujer' else False),
+            discord.SelectOption(label='Todo', value='Otro', default=True if profile.gender == 'Otro' else False)
+        ], min_values=1, max_values=1)
+        self.add_item(self.name)
+        self.add_item(self.age)
+        self.add_item(self.gender)
+        self.add_item(self.sex_preference)
+        self.add_item(self.description)
+        
+    async def on_submit(self, interaction: discord.Interaction):
+        self.profile.name = self.name.value
+        age = int(self.age.value)
+        if age < 9 or age > 99:
+            self.age.value = '-'
+        else:
+            self.profile.age = age
+        self.profile.gender = self.gender.values[0]
+        self.profile.sex_preference = self.sex_preference.values[0]
+        self.profile.description = self.description.value
+        await self.profile.save()
+        self.stop()
+    
+
+class TinderView(discord.ui.View):
+    def __init__(self, bot: Bot, user: User):
+        super().__init__(timeout=180)
+        self.bot = bot
+        self.user = user
+    
+    @discord.ui.button(label="Editar Perfil", style=discord.ButtonStyle.primary)
+    async def profile(self, interaction: discord.Interaction, button):
+        user = await (Profile(interaction.user)).get_user_data()
+        modal = TinderModal(user)
+        try:
+            await interaction.response.send_modal(modal)
+            timeout = await modal.wait()
+            if timeout:
+                await interaction.response.send_message("Has cancelado la edición")
+            else:
+                await interaction.response.send_message(embed=build_profile(user), view=TinderView(self.bot))
+        except Exception as e:
+            print('Error: '+str(e))
+    
+    @discord.ui.button(label="Imágen", style=discord.ButtonStyle.primary)
+    async def edit_image(self, interaction: discord.Interaction, button):
+        class ImageSaveView(discord.ui.View):
+            def __init__(self, profile: Profile):
+                super().__init__(timeout=60)
+                self.cont = True
+                self.profile = profile
+            
+            @discord.ui.button(label="Guardar", style=discord.ButtonStyle.success)
+            async def save(self, interaction: discord.Interaction, button):
+                self.cont = False
+                await self.profile.save()
+                await interaction.response.send_message("Imagen guardada correctamente!", ephemeral=True)
+                self.stop()
+            @discord.ui.button(label="Cancelar", style=discord.ButtonStyle.danger)
+            async def cancel(self, interaction: discord.Interaction, button):
+                self.cont = False
+                await interaction.response.send_message("Has cancelado la edición", ephemeral=True)
+                self.stop()
+        
+        profile = await (Profile(interaction.user)).get_user_data()
+        image_view = ImageSaveView(profile)
+        msg = await self.user.send("Envía la url de la imagen que quieras usar", embed=build_profile(profile), view=image_view)
+        await interaction.response.send_message("Es recomendable usar un enlace terminado con .png o .jpg", ephemeral=True)
+        while image_view.cont:
+            img: discord.Message = await self.bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
+            profile.image = img.content
+            await img.delete()
+            await msg.edit(embed=build_profile(profile))
+    
+    @discord.ui.button(label="Color", style=discord.ButtonStyle.primary)
+    async def edit_color(self, interaction: discord.Interaction, button):
+        # mostrar vista de perfil con botón de guardar / cancelar
+        # listado de botónes con diferentes colores + opción de añadir uno custom
+        class ColorSelectView(discord.ui.View):
+            def __init__(self, profile: Profile):
+                super().__init__(timeout=60)
+                self.cont = True
+                self.profile = profile
+                self.msg = None
+            @discord.ui.button(label="Negro", style=discord.ButtonStyle.gray, emoji='<:000000:1009570113604833402>')
+            async def black(self, interaction: discord.Interaction, button):
+                self.profile.color = '#000000'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Discord", style=discord.ButtonStyle.gray, emoji='<:2f3136:1009570127924170852>')
+            async def dis(self, interaction: discord.Interaction, button):
+                self.profile.color = '#2f3136'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Gris", style=discord.ButtonStyle.gray, emoji='<:818181:1009570201509056573>')
+            async def gray(self, interaction: discord.Interaction, button):
+                self.profile.color = '#818181'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Blanco", style=discord.ButtonStyle.gray, emoji='<:ffffff:1009570267695153194>')
+            async def white(self, interaction: discord.Interaction, button):
+                self.profile.color = '#ffffff'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Azul", style=discord.ButtonStyle.gray, emoji='<:2246cc:1009570180034220162>')
+            async def blue(self, interaction: discord.Interaction, button):
+                self.profile.color = '#2246cc'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Cian", style=discord.ButtonStyle.gray, emoji='<:3fbcef:1009570138183442593>')
+            async def cyan(self, interaction: discord.Interaction, button):
+                self.profile.color = '#3fbcef'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Morado", style=discord.ButtonStyle.gray, emoji='<:67087b:1009570189697892513>')
+            async def purple(self, interaction: discord.Interaction, button):
+                self.profile.color = '#67087b'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Fucsia", style=discord.ButtonStyle.gray, emoji='<:e3007b:1009570234119749702>')
+            async def fuchsia(self, interaction: discord.Interaction, button):
+                self.profile.color = '#e3007b'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Rosa", style=discord.ButtonStyle.gray, emoji='<:f59fbc:1009570257972777041>')
+            async def pink(self, interaction: discord.Interaction, button):
+                self.profile.color = '#f59fbc'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Rojo", style=discord.ButtonStyle.gray, emoji='<:cc2222:1009570211957055601>')
+            async def red(self, interaction: discord.Interaction, button):
+                self.profile.color = '#cc2222'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Naranja", style=discord.ButtonStyle.gray, emoji='<:e87b1b:1009570222589607986>')
+            async def orange(self, interaction: discord.Interaction, button):
+                self.profile.color = '#e87b1b'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Amarillo", style=discord.ButtonStyle.gray, emoji='<:f8f400:1009570244936880168>')
+            async def yellow(self, interaction: discord.Interaction, button):
+                self.profile.color = '#f8f400'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Verde", style=discord.ButtonStyle.gray, emoji='<:006a25:1009570147368976444>')
+            async def green(self, interaction: discord.Interaction, button):
+                self.profile.color = '#006a25'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Verde Claro", style=discord.ButtonStyle.gray, emoji='<:7cc623:1009570167933632612>')
+            async def light_green(self, interaction: discord.Interaction, button):
+                self.profile.color = '#000000'
+                await interaction.response.edit_message(embed=build_profile(self.profile), view=color_select)
+            @discord.ui.button(label="Cancelar", style=discord.ButtonStyle.danger)
+            async def cancel(self, interaction: discord.Interaction, button):
+                self.cont = False
+                await interaction.response.send_message("Has cancelado la edición", ephemeral=True)
+                self.stop()
+            @discord.ui.button(label="Guardar", style=discord.ButtonStyle.success)
+            async def save(self, interaction: discord.Interaction, button):
+                self.cont = False
+                await self.profile.save()
+                await interaction.response.send_message("Imagen guardada correctamente!", ephemeral=True)
+                self.stop()
+                
+        profile = await (Profile(interaction.user)).get_user_data()
+        color_select = ColorSelectView(profile)
+        msg = await self.user.send("Elige el color que deseas usar", embed=build_profile(profile), view=color_select)
+        await interaction.response.send_message("Puedes poner el color enviando el código en formato hexadecimal (ej: `#ff00ff`)", ephemeral=True)
+        while color_select.cont:
+            color: discord.Message = await self.bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
+            profile.color = color.content
+            await color.delete()
+            await msg.edit(embed=build_profile(profile))
+
+    @discord.ui.button(label="Hobbies", style=discord.ButtonStyle.primary)
+    async def edit_hobbies(self, interaction: discord.Interaction, button):
+        # select con un listado de hobbies para añadir
+        pass
 
 
 class PersistentView(discord.ui.View):
@@ -104,95 +309,15 @@ class PersistentView(discord.ui.View):
 
 class Tinder(Cog):
     def __init__(self, bot: Bot):
-        self.bot = bot
+        self.bot = bot    
     
-    
-    async def __get_user_data(self, user_id):
-        doc_ref = await tinder_get_user(user_id)
-        user_data = doc_ref.get()
-        return user_data.to_dict()
-    
-    
-    async def __get_reminding_options(self, user: User):
-        msg = ""
-        user_data = await self.__get_user_data(user.id)
-        
-        def has_property(property, text):
-            try:
-                if user_data[property] is None:
-                    return "" + text + "\n"
-                return ""
-            except:
-                return "" + text + "\n"
-        
-        msg += has_property("name", "`*tnombre tu nombre`")
-        msg += has_property("gender", "`*tgenero masculino / femenino / ...`")
-        msg += has_property("image", "`*timagen url de la imagen`")
-        msg += has_property("description", "`*tdesc una descripción sobre ti`")
-        msg += has_property("hobbies", "`*thobbies tus hobbies`")
-        msg += has_property("phrase", "`*tfrase una frase para conquistar`")
-        msg += has_property("color", "`*tcolor color hex para poner en el embed (ej: #00f0ff)`")
-        if msg != "":
-            await user.send(msg)
-    
-    
-    @command(name='tnombre', aliases=['tname'], description="Cambia tu nombre")
-    async def _tinder_name(self, ctx: Context, *, name: str):
-        """<nombre>"""
-        await tinder_set_name(ctx.author.id, name)
-        await self._tinder_profile(ctx)
-    
-    @command(name='tgenero', aliases=['tgender'], description="Cambia tu género")
-    async def _tinder_gender(self, ctx: Context, *, gender: str):
-        """<género femenino / masculino / ...>"""
-        await tinder_set_gender(ctx.author.id, gender)
-        await self._tinder_profile(ctx)
-    
-    @command(name='timagen', aliases=['timage'], description="Cambia tu imagen")
-    async def _tinder_image(self, ctx: Context, image: str):
-        """<url imagen>"""
-        await tinder_set_image(ctx.author.id, image)
-        await self._tinder_profile(ctx)
-    
-    @command(name='tdesc', aliases=['tdescription'], description="Cambia tu descripción")
-    async def _tinder_description(self, ctx: Context, *, description: str):
-        """<descripción>"""
-        await tinder_set_description(ctx.author.id, description)
-        await self._tinder_profile(ctx)
-    
-    @command(name='thobbies', aliases=['thobby'], description="Cambia tus hobbies")
-    async def _tinder_hobbies(self, ctx: Context, *, hobbies: str):
-        """<lista de hobbies>"""
-        await tinder_set_hobbies(ctx.author.id, hobbies)
-        await self._tinder_profile(ctx)
-        
-    @command(name='tfrase', aliases=['tphrase'], description="Cambia tu frase")
-    async def _tinder_phrase(self, ctx: Context, *, phrase: str):
-        """<frase para conquistar a la gente o no se, ilústrense>"""
-        await tinder_set_phrase(ctx.author.id, phrase)
-        await self._tinder_profile(ctx)
-        
-    @command(name='tcolor', description="Cambia tu color")
-    async def _tinder_color(self, ctx: Context, color: str):
-        """<color en hexadecimal (ej: #00f0ff)>"""
-        try:
-            color = color.split('#')
-            color = color[0] if len(color) == 1 else color[1]
-            color = int('0x'+color, 16)
-        except:
-            raise CustomError("Color inválido")
-        
-        await tinder_set_color(ctx.author.id, color)
-        await self._tinder_profile(ctx)
-    
-    @command(name='tperfil', aliases=['tprofile'], description="Muestra tu perfil")
+    @command(name='perfil', aliases=['profile'], description="Muestra tu perfil")
     async def _tinder_profile(self, ctx: Context):
         """Ver tu perfil"""
         try:
-            user = await self.__get_user_data(ctx.author.id)
+            user = await (Profile(ctx.author)).get_user_data()
             embed = build_profile(user)
-            await self.__get_reminding_options(ctx.author)
-            await ctx.author.send(embed=embed)
+            await ctx.author.send(embed=embed, view=TinderView(self.bot, ctx.author))
         except Exception as e:
             print(e)
             raise CustomError("No tienes un perfil creado `*help Tinder`")
@@ -200,7 +325,7 @@ class Tinder(Cog):
     @command(name="tinder", description="Ver los otros perfiles")
     async def _tinder(self, ctx: Context):
         """"""        
-        user = await self.__get_user_data(ctx.author.id)
+        user = await (Profile(ctx.author)).get_user_data()
         try:
             user["id"] = ctx.author.id
         except:
@@ -220,8 +345,6 @@ class Tinder(Cog):
         curr_user = users[0]
         curr_user_id = list(curr_user.keys())[0]
         await ctx.author.send(embed=build_profile(curr_user[curr_user_id]), view=PersistentView(self.bot, user, users, ctx.author))
-        #['⬅', '❌', '✅']
-        #reactions = [u'\U00002B05', u'\U0000274C', u'\U00002705']
     
     @command(name="deltinder", description="Elimina tu perfil")
     async def _deltinder(self, ctx: Context):
@@ -254,7 +377,6 @@ class Tinder(Cog):
     
     """@command(name="set_match")
     async def _set_match(self, ctx: Context):
-        """ """
         revised = []
         users_list = (await tinder_get_list()).stream()
         print('users_list', users_list)

@@ -37,6 +37,10 @@ class Embed:
         self.embed.colour = 0xAA0000
         return self
 
+    def warn(self) -> Embed:
+        self.embed.colour = 0xFFB200
+        return self
+
     def economy(self) -> Embed:
         self.embed.colour = 0xFFDB26
         return self

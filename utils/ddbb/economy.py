@@ -1,6 +1,4 @@
 import time
-import discord
-from discord.ext.commands import CommandInvokeError
 from datetime import datetime, timedelta
 from .DB import __get__, __set__
 from utils.errors import TimeError, NotMoneyError
@@ -18,6 +16,10 @@ async def set_bal(server: int, user: int, money: int = 0):
         "money": money,
         "inventory": []
     })
+
+
+async def update_bal_negative(server: int, user: int, money: int):
+    await update_bal(server, user, money*-1)
 
 
 async def update_bal(server: int, user: int, money: int):
@@ -67,9 +69,16 @@ async def update_work(server: int, user: int, money: int):
     return doc
 
 
-async def get_items(server: int, category=None):
+async def items_get(server: int, category=None):
     doc_ref = db.collection(str(server)).document('Datos').collection('shop')
     if category is not None:
         doc_ref.where(u'category', u'==', category.lower())
 
-    
+async def item_save(server: int, item: object):
+    pass
+
+async def item_delete(server: int, item_id: int):
+    pass
+
+async def item_edit(server: int, item_id: int, item: object):
+    pass

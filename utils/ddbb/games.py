@@ -1,4 +1,3 @@
-import discord
 from datetime import datetime
 
 from .DB import __get_game__, __set_game__, __get__
@@ -19,7 +18,6 @@ async def oj_set_card(server: int, user: int, data: object):
         await __set_game__(str(server), 'oj', str(user), data)
     except Exception as e:
         print('error oj_set_card', e)
-
 
 async def start_tic_tac_toe(server: int):
     cross = ':x:'

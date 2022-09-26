@@ -1,10 +1,11 @@
 import discord
 from discord.ext.commands import *
 from utils.responses.Embed import Embed
+from utils.ddbb.economy import *
 from utils.ddbb.DB import __get__, __set__
 
 
-async def send(ctx: Context, embed: discord.Embed):
+async def _send(ctx: Context, embed: discord.Embed):
     channel = 782309852910977154  # TODO: DDBB query
     try:
         await ctx.guild.get_channel(channel).send(embed=embed)
@@ -21,16 +22,17 @@ async def send(ctx: Context, embed: discord.Embed):
         pass
 
 
-async def win(ctx: Context, user: discord.User, money: int, type: str):
-
+async def win_money(ctx: Context, user: discord.User, money: int, type: str):
+    await update_bal(ctx.guild.id, user.id, money)
     embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}') \
         .success()
 
-    await send(ctx, embed.get_embed())
+    await _send(ctx, embed.get_embed())
 
 
-async def lose(ctx: Context, user: discord.User, money: int, type: str):
+async def lose_money(ctx: Context, user: discord.User, money: int, type: str):
+    await update_bal_negative(ctx.guild.id, user.id, money)
     embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}') \
         .failure()
 
-    await send(ctx, embed.get_embed())
+    await _send(ctx, embed.get_embed())
