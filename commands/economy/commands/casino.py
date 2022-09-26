@@ -4,7 +4,7 @@ import threading
 import time
 import discord
 from discord.ext.commands import Context, Bot
-from utils.logs.economy import lose_money, win_money
+from utils.logs.economy import win_money, lose_money
 from utils.ddbb.economy import check_bal
 from utils.errors import CustomError, MoneyError
 from utils.responses.Embed import Embed
@@ -28,16 +28,14 @@ async def flip(ctx: Context, money: int):
 
     embed = Embed(title='FLIP GAME')
 
-    await win(ctx, ctx.author, money, 'Flip')
-
     if res == 0:
-        money *= -1
         embed.description = f'Has perdido `{abs(money)}` haikoins!!'
         embed.failure()
+        await lose_money(ctx, ctx.author, money, 'flip')
     else:
         embed.description = f'Has ganado `{abs(money)}` haikoins!!'
         embed.success()
-    await update_bal(ctx.guild.id, ctx.author.id, money)
+        await win_money(ctx, ctx.author, money, 'flip')
 
     await ctx.send(embed=embed.get_embed())
 
