@@ -78,7 +78,7 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
         if money < 100:
             raise MoneyError(min=100)
     except:
-        raise CustomError('Invalid Ammount')
+        raise MoneyError(min=100)
 
     if not args:
         raise CustomError('A que quieres apostar')
