@@ -17,7 +17,7 @@ class Economy(Cog):
         return await balance(ctx, user)
     
     @command(name='give', description="Donar dinero a un usuario")
-    async def _create_item(self, ctx: Context, user: discord.User, money: int):
+    async def _give(self, ctx: Context, user: discord.User, money: int):
         """ """
         return await give(ctx, user, money)
 
