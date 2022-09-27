@@ -43,6 +43,7 @@ class Embed:
     
     def roulette(self) -> Embed:
         self.embed.colour = 0xCBFF16
+        return self
 
     def economy(self) -> Embed:
         self.embed.colour = 0xFFDB26
