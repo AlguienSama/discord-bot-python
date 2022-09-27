@@ -1,3 +1,4 @@
+import discord
 from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner
 from commands.admin.commands.experiencia import Metas, ListaMetas, EliminarMeta, CanalMeta, RemoveExp, AddExp, ResetExp
 from commands.admin.commands.canales import canalesPermitidos, quitarCanalesPermitidos, listaCanalesPermitidos
@@ -103,13 +104,13 @@ class Administration(Cog):
 
     @command(name='add-money', description='Añadir dinero a un usuario', help='<user> <money>')
     @check_any(is_admin())
-    async def _add_money(self, ctx: Context, user, money: int):
+    async def _add_money(self, ctx: Context, user: discord.User, money: int):
         """ """
         return await add_money(ctx, user, money)
 
     @command(name='remove-money', description='Quitar dinero a un usuario', help='<user> <money>')
     @check_any(is_admin())
-    async def _remove_money(self, ctx: Context, user, money: int):
+    async def _remove_money(self, ctx: Context, user: discord.User, money: int):
         """ """
         return await remove_money(ctx, user, money)
 
