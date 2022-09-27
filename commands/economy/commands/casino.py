@@ -29,11 +29,11 @@ async def flip(ctx: Context, money: int):
     embed = Embed(title='FLIP GAME')
 
     if res == 0:
-        embed.description = f'Has perdido `{abs(money)}` haikoins!!'
+        embed.description = f'Has perdido `{abs(money):,}` haikoins!!'
         embed.failure()
         await lose_money(ctx, ctx.author, money, 'flip')
     else:
-        embed.description = f'Has ganado `{abs(money)}` haikoins!!'
+        embed.description = f'Has ganado `{abs(money):,}` haikoins!!'
         embed.roulette()
         await win_money(ctx, ctx.author, money, 'flip')
 
@@ -101,8 +101,8 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
                     continue
             return string
         
-        desc = f"Dinero apostado: **{bet['ammount']}** 💰 \n"
-        desc += f"Dinero total: **{bet['total_ammount']}** 💰 \n"
+        desc = f"Dinero apostado: **{int(bet['ammount']):,}** 💰 \n"
+        desc += f"Dinero total: **{int(bet['total_ammount']):,}** 💰 \n"
         res = check_bet(bet['bets']['num'], numbers)
         if res != '| ':
             desc += f'Números: **{res}**\n'
@@ -188,13 +188,13 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
         ganadores = ''
         mentions = ''
         for win in wins:
-            ganadores += f'**<@{win}> + {wins[win]} 💰**\n'
+            ganadores += f'**<@{win}> + {int(wins[win]):,} 💰**\n'
             mentions += f'<@{win}> '
         if ganadores == '':
             ganadores = '_ _'
         perdedores = ''
         for loser in losers:
-            perdedores += f'**<@{loser}> - {losers[loser]} 💰**\n'
+            perdedores += f'**<@{loser}> - {int(losers[loser]):,} 💰**\n'
         if perdedores == '':
             perdedores = '_ _'
         

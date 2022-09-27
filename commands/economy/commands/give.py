@@ -18,6 +18,6 @@ async def give(ctx: Context, user: discord.User, money: int):
     await lose_money(ctx, ctx.author, money, f'Give to {user.id}')
     await win_money(ctx, user, money, f'Recive from {ctx.author.id}')
     
-    embed = Embed(title='Donación', user=ctx.author, description=f'<@{ctx.author.id}> ha donado {money}💰 a <@{user.id}>').success()
+    embed = Embed(title='Donación', user=ctx.author, description=f'<@{ctx.author.id}> ha donado {money:,}💰 a <@{user.id}>').success()
     
     await ctx.channel.send(embed=embed.get_embed())    
