@@ -23,16 +23,22 @@ async def _send(ctx: Context, embed: discord.Embed):
             pass
         pass
 
+def msg(ctx: discord.ext.commands.Context, user: discord.User, money: int, win: bool):
+    return f'User: {user.mention}\nUser ID: **{user.id}**\nAcción: **{"Ganar" if win else "Perder"}**\nCantidad: **{money:,}**\nCanal: {ctx.channel.mention} **{ctx.channel.id}**'
 
 async def win_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=f'{user.id} ha ganado {money} en {ctx.channel.id}').success()
-
+    embed = Embed(title=type, user=user, description=msg(ctx, user, money, True)).success()
     await _send(ctx, embed.get_embed())
 
 
 async def lose_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal_negative(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=f'{user.id} ha perdido {money} en el canal {ctx.channel.id}').failure()
+    embed = Embed(title=type, user=user, description=msg(ctx, user, money, False)).failure()
+    await _send(ctx, embed.get_embed())
 
+async def log_work(ctx: Context, money: int):
+    user = ctx.author
+    await update_work(ctx.guild.id, user.id, money)
+    embed = Embed(title='Work', user=user, description=msg(ctx, user, money, True)).success()
     await _send(ctx, embed.get_embed())
