@@ -23,22 +23,23 @@ async def _send(ctx: Context, embed: discord.Embed):
             pass
         pass
 
-def msg(ctx: discord.ext.commands.Context, user: discord.User, money: int, win: bool):
-    return f'User: {user.mention}\nUser ID: **{user.id}**\nAcción: **{"Ganar" if win else "Perder"}**\nCantidad: **{money:,}**\nCanal: {ctx.channel.mention} **{ctx.channel.id}**'
+def _embed(ctx: discord.ext.commands.Context, user: discord.User, money: int, type: str, win: bool):
+    embed = Embed(title=type, user=user)
+    embed.description = f'User: {user.mention}\nUser ID: **{user.id}**\nAcción: **{"Ganar" if win else "Perder"}**\nCantidad: **{money:,}**\nCanal: {ctx.channel.mention} **{ctx.channel.id}**'
+    embed.success() if win else embed.failure()
+    embed.set_timestamp()
+    return embed.get_embed()
 
 async def win_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=msg(ctx, user, money, True)).success()
-    await _send(ctx, embed.get_embed())
+    await _send(ctx, _embed(ctx, user, money, type, True))
 
 
 async def lose_money(ctx: Context, user: discord.User, money: int, type: str):
     await update_bal_negative(ctx.guild.id, user.id, money)
-    embed = Embed(title=type, user=user, description=msg(ctx, user, money, False)).failure()
-    await _send(ctx, embed.get_embed())
+    await _send(ctx, _embed(ctx, user, money, type, False))
 
 async def log_work(ctx: Context, money: int):
     user = ctx.author
     await update_work(ctx.guild.id, user.id, money)
-    embed = Embed(title='Work', user=user, description=msg(ctx, user, money, True)).success()
-    await _send(ctx, embed.get_embed())
+    await _send(ctx, _embed(ctx, user, money, 'Work', True))
