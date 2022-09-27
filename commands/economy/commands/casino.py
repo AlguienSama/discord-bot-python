@@ -187,7 +187,7 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
         color = 'red' if num > 0 and num < 11 and num % 2 == 1 or num > 10 and num < 19 and num % 2 == 0 or num > 18 and num < 29 and num % 2 == 1 or num > 28 and num < 37 and num % 2 == 0 else 'black' if num != 0 else 0
         
         wins = {}
-        loses = []
+        losers = {}
         def check_win(arr, val):
             for a in arr:
                 if str(a) == str(val):
@@ -219,18 +219,27 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
                 else:
                     wins[user_id] = ammount
             else:
-                loses.append(user_id)
+                if user_id in losers:
+                    losers[bet['user']] += bet['total_ammount']
+                else:
+                    losers[bet['user']] = bet['total_ammount']
         
         ganadores = ''
         for win in wins:
             ganadores += f'**<@{win}> + {wins[win]} 💰**\n'
         if ganadores == '':
-            ganadores = 'Nadie ganó'
+            ganadores = '_ _'
+        perdedores = ''
+        for loser in losers:
+            perdedores += f'**<@{loser}> - {losers[loser]} 💰**\n'
+        if perdedores == '':
+            perdedores = '_ _'
         
         result = f'**Número {num}**'
         if num != 0:
             result += f'\n{par}, {half}, {trio}, {row}, {color}'
         embed = Embed(title='Ruleta', description=result).success()
         embed.add_field(title='Ganadores', desc=ganadores)
+        embed.add_field(title='Perdedores', desc=ganadores)
         await ctx.channel.send(embed=embed.get_embed())
 
