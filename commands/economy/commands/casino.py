@@ -218,11 +218,13 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
                     wins[user_id] += ammount
                 else:
                     wins[user_id] = ammount
-            else:
                 if user_id in losers:
-                    losers[bet['user']] += bet['total_ammount']
+                    del losers[user_id]
+            elif not user_id in wins:
+                if user_id in losers:
+                    losers[user_id] += bet['total_ammount']
                 else:
-                    losers[bet['user']] = bet['total_ammount']
+                    losers[user_id] = bet['total_ammount']
         
         ganadores = ''
         for win in wins:
