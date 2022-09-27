@@ -40,6 +40,9 @@ class Embed:
     def warn(self) -> Embed:
         self.embed.colour = 0xFFB200
         return self
+    
+    def roulette(self) -> Embed:
+        self.embed.colour = 0xCBFF16
 
     def economy(self) -> Embed:
         self.embed.colour = 0xFFDB26

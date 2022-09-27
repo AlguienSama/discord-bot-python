@@ -34,7 +34,7 @@ async def flip(ctx: Context, money: int):
         await lose_money(ctx, ctx.author, money, 'flip')
     else:
         embed.description = f'Has ganado `{abs(money)}` haikoins!!'
-        embed.success()
+        embed.roulette()
         await win_money(ctx, ctx.author, money, 'flip')
 
     await ctx.send(embed=embed.get_embed())
@@ -227,8 +227,10 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
                     losers[user_id] = bet['total_ammount']
         
         ganadores = ''
+        mentions = ''
         for win in wins:
             ganadores += f'**<@{win}> + {wins[win]} 💰**\n'
+            mentions += f'<@{win}> '
         if ganadores == '':
             ganadores = '_ _'
         perdedores = ''
@@ -237,11 +239,11 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
         if perdedores == '':
             perdedores = '_ _'
         
-        result = f'**Número {num}**'
+        result = f'**NÚMERO {num}**'
         if num != 0:
-            result += f'\n{par}, {half}, {trio}, {row}, {color}'
-        embed = Embed(title='Ruleta', description=result).success()
-        embed.add_field(title='Ganadores', desc=ganadores)
-        embed.add_field(title='Perdedores', desc=perdedores)
+            result += f'\n{par} | {half} | {trio} | {row} | {color}'
+        embed = Embed(title='RULETA!', description=result).roulette()
+        embed.add_field(title='GANADORES', desc=ganadores)
+        embed.add_field(title='PERDEDORES', desc=perdedores)
         await ctx.channel.send(embed=embed.get_embed())
 
