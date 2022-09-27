@@ -240,6 +240,6 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
             result += f'\n{par}, {half}, {trio}, {row}, {color}'
         embed = Embed(title='Ruleta', description=result).success()
         embed.add_field(title='Ganadores', desc=ganadores)
-        embed.add_field(title='Perdedores', desc=ganadores)
+        embed.add_field(title='Perdedores', desc=perdedores)
         await ctx.channel.send(embed=embed.get_embed())
 
