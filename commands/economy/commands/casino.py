@@ -40,38 +40,6 @@ async def flip(ctx: Context, money: int):
     await ctx.send(embed=embed.get_embed())
 
 
-class Roulette(threading.Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None) -> None:
-        super().__init__(group, target, name, args, kwargs, daemon=daemon)
-        self.bets = []
-        self.bets.append(args[0])
-        self.bot: Bot = args[1]
-        self.guild: discord.Guild = args[2]
-        self.channel: discord.TextChannel = args[3]
-        self.timer = threading.Event()
-        self.time = 5
-        self.final_time = int(round(time.time())) + self.time
-    
-    def run(self):
-        self.timer.wait(self.time)
-        asyncio.run(self.game_start())
-        print(self.bets)
-    
-    def stop_timer(self):
-        self.timer.set()
-    
-    def time_left(self):
-        return (self.final_time - int(round(time.time())))
-    
-    def add_bet(self, bet):
-        self.bets.append(bet)
-    
-    async def game_start(self):
-        print('starting game')
-        channel = self.bot.get_channel(self.channel.id)
-        await channel.send('Pito')
-
-
 async def join_roulette(bot: Bot, ctx: Context, money: int, args):
     try:
         money = int(money)
@@ -87,12 +55,16 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
     def check_bet(arg, vals, name):
         for val in vals:
             if val == arg:
+                if val in bet['bets'][name]:
+                    continue
                 bet['bets'][name].append(val)
                 bet['v']+=1
                 return True
             try:
                 for d in vals[val]:
                     if d == arg:
+                        if val in bet['bets'][name]:
+                            continue
                         bet['bets'][name].append(val)
                         bet['v']+=1
                         return True
@@ -118,20 +90,7 @@ async def join_roulette(bot: Bot, ctx: Context, money: int, args):
     await check_bal(ctx.guild.id, ctx.author.id, bet['total_ammount'])
     await lose_money(ctx, ctx.author, bet['total_ammount'], 'Ruleta')
     
-    """ for thread in threading.enumerate():
-        if thread.name == f'roulette_{ctx.guild.id}':
-            exists = True
-            thread.add_bet(bet)
-            print(f'Time left: {thread.time_left()} seconds')
-            if args[4] == 'blu':
-                thread.stop_timer()
-
-    if not exists:
-        r = Roulette(name=f'roulette_{ctx.guild.id}', args=(bet, bot, ctx.guild, ctx.channel), daemon=True)
-        r.start()
-        print(f'Starting roulette game in channel {ctx.channel.id}') """
     global games
-    
     async def send_message():
         def check_bet(args, vals):
             string = '| '
