@@ -1,4 +1,5 @@
 from __future__ import annotations
+import datetime
 
 import discord
 
@@ -15,7 +16,7 @@ class Embed:
         self.embed = discord.Embed(description=description)
         self.embed.set_footer(text="IT Crowd", icon_url="https://cdn.discordapp.com/emojis/562075100116156418.png")
         if user:
-            self.embed.set_author(name=user.display_name, icon_url=user.avatar.url)
+            self.embed.set_author(name=f'{user.name}#{user.discriminator}', icon_url=user.avatar.url)
         if title:
             self.embed.title = title
         if description:
@@ -59,6 +60,9 @@ class Embed:
     
     def set_image(self, image) -> Embed:
         self.embed.set_image(url=image)
+        
+    def set_timestamp(self, timestamp = None):
+        self.embed.timestamp = datetime.datetime.now() if timestamp is None else timestamp
 
     def get_embed(self) -> discord.Embed:
         if self.title:
