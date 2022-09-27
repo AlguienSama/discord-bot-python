@@ -1,4 +1,6 @@
 from discord.ext.commands import *
+
+from commands.economy.commands.give import give
 from .commands.balance import balance
 from .commands.work import work
 from .commands.casino import *
@@ -13,6 +15,11 @@ class Economy(Cog):
     async def bal(self, ctx: Context, user=None):
         """ """
         return await balance(ctx, user)
+    
+    @command(name='give', description="Donar dinero a un usuario")
+    async def _create_item(self, ctx: Context, user: discord.User, money: int):
+        """ """
+        return await give(ctx, user, money)
 
     @command(name='work', description="Obtener monedas gratuitas")
     async def work(self, ctx: Context):

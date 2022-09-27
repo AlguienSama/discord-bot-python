@@ -6,7 +6,7 @@ from utils.ddbb.economy import *
 from utils.logs.economy import win_money, lose_money
 
 
-async def balance(ctx: Context, user: discord.User, money: int):
+async def give(ctx: Context, user: discord.User, money: int):
     try:
         user = await UserConverter().convert(ctx, user)
     except:
