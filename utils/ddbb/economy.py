@@ -56,7 +56,7 @@ async def update_work(server: int, user: int, money: int):
     except Exception as e:
         print(e)
         return await __set__(str(server), 'economy', str(user), {
-            "money": money,
+            "money": money + 10000,
             "inventory": [],
             "work_time": work_time().strftime('%Y-%m-%d %H:%M:%S')
         })
