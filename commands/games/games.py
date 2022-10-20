@@ -2,6 +2,7 @@ from discord.ext.commands import *
 from commands.games.commands.connect_4 import conenct_4
 from commands.games.commands.oj_card import oj_card
 from commands.games.commands.oj_game import oj_game
+from commands.games.commands.rr import russian_roulette
 from commands.games.commands.tic_tac_toe import tic_tac_toe
 from commands.games.commands.battle_royale import BattleRoyale
 
@@ -21,7 +22,7 @@ class Games(Cog):
         return await conenct_4(self.bot, ctx)
     
     @command(name='br', description="Battle Royale (en progreso)")
-    async def _join_br(self, ctx: Context, name:str=None, image:str=None):
+    async def _join_br(self, ctx: Context, name:str = None, image:str = None):
         """ """
         return await BattleRoyale.join(ctx, name, image)
     
@@ -35,6 +36,10 @@ class Games(Cog):
         """ """
         return await oj_card(ctx)
 
+    @command(name='rr', description="Ruleta Rusa")
+    async def _rr(self, ctx: Context, money:int = 0):
+        """ """
+        return await russian_roulette(self.bot, ctx, money)
 
 async def setup(bot: Bot) -> None:
     await bot.add_cog(Games(bot))

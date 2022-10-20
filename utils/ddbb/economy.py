@@ -42,6 +42,14 @@ async def check_bal(server: int, user: int, money: int):
     if bal["money"] < money:
         raise NotMoneyError((bal["money"] - money) * -1)
 
+async def has_money(server: int, user: int, money: int):
+    bal = await get_bal(server, user)
+    bal = bal.get()
+    bal = bal.to_dict()
+    if bal is None:
+        return money != 0
+    return bal["money"] >= money
+
 
 def work_time() -> datetime:
     return datetime.utcnow() + timedelta(hours=4)

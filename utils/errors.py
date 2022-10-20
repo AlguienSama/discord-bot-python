@@ -91,11 +91,11 @@ async def errors(ctx: Context, error):
         embed.description = 'Permisos insuficientes para enviar el mensaje'
 
     elif isinstance(error, CommandInvokeError):
-
+        
+        print(error)
         if isinstance(error.original, ValueError):
             embed.description = f'Debes de introducir los parámetros correctamente'
-            embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name,
-                                                            ctx.command.help))
+            embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
 
         elif isinstance(error.original, NoneType):
             embed.description = f'Debes de introducir los parámetros correctamente'
