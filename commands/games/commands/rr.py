@@ -99,7 +99,7 @@ class RRGame():
         global games
         del games[self.game_id]
         embed = Embed(title='RUSSIAN ROULETTE').success()
-        embed.description = '**GANADORES**\n' if len(self.players) > 1 else '**GANADOR**\n'
+        embed.description = '**GANADORES**\n' if len(self.players) > 1 else '**GANADOR**\n' if len(self.players) == 1 else 'Que triste, jugaste solo y te moriste'
         try:
             money = int(self.ammount * len(self.player_list) / len(self.players))
         except:
@@ -292,7 +292,7 @@ async def russian_roulette(bot: Bot, ctx: Context, money: int = 0):
     if str(ctx.channel.id) in games:
         raise CustomError('Ya hay una partida en juego!')
     
-    games[str(ctx.channel.id)] = {'difficulty': Difficulty.PEACEFULL, 'gamemode': Gamemode.ONE_DEATH, 'ammount': money, 'time': 30, 'guild': ctx.guild.id, 'channel': ctx.channel.id, 'author':ctx.author.id, 'players': [{'name': ctx.author.display_name, 'id': ctx.author.id}]}
+    games[str(ctx.channel.id)] = {'difficulty': Difficulty.PEACEFULL, 'gamemode': Gamemode.ONE_DEATH, 'ammount': money, 'time': 60, 'guild': ctx.guild.id, 'channel': ctx.channel.id, 'author':ctx.author.id, 'players': [{'name': ctx.author.display_name, 'id': ctx.author.id}]}
     
     view = RRView(bot, str(ctx.channel.id))
     view.message = await ctx.channel.send(embed=get_embed(games[str(ctx.channel.id)]), view=view)
