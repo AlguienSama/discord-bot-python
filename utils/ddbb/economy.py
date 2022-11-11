@@ -47,7 +47,7 @@ async def has_money(server: int, user: int, money: int):
     bal = bal.get()
     bal = bal.to_dict()
     if bal is None:
-        return money != 0
+        return money == 0
     return bal["money"] >= money
 
 

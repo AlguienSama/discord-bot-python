@@ -46,10 +46,7 @@ class RRGame():
         self.round = 0
     
     def embed(self):
-        embed = Embed(title='RUSSIAN ROULETTE').warn()
-        difficulty = 'PACÍFICO' if str(self.difficulty) == str(Difficulty.PEACEFULL) else 'KICK' if str(self.difficulty) == str(Difficulty.KICK) else 'BAN'
-        gamemode = 'UNA MUERTE' if str(self.gamemode) == str(Gamemode.ONE_DEATH) else 'UN SUPERVIVIENTE'
-        embed.add_field(title='REGLAS', desc=f'Dificultad: {difficulty}\nGamemode: {gamemode}\nApuesta: {self.ammount} 💰\nPremio: {self.ammount * len(self.player_list)} 💰\nJugadores: {len(self.player_list)}')
+        embed = Embed(title='RUSSIAN ROULETTE', description='**SIGUIENTE RONDA**').warn()
         desc = ''
         j = 0
         for i in range(0, len(self.player_list)-1):
@@ -84,16 +81,22 @@ class RRGame():
                     
                     if self.gamemode == Gamemode.ONE_DEATH:
                         ended = True
-                        return await self.end()
+                        await self.end()
+                        break
                     else:
                         if len(self.players) <= 1:
                             ended = True
-                            return await self.end()
+                            await self.end()
+                            break
                         else:
                             await sleep(1)
+                            break
                 else:
                     await (await self.bot.fetch_channel(int(self.channel))).send(embed=Embed(description=f'**{self.players[i]["name"]}** se salva ✝️').get_embed())
                     await sleep(0.8)
+            if len(self.players) > 1:
+                await (await self.bot.fetch_channel(int(self.channel))).send(embed=Embed(description=f'SIGUIENTE RONDA: **{len(self.players)} jugadores** restantes\nEmpezando en 2 segundos').warn().get_embed())
+            await sleep(2)
 
     async def end(self):
         global games
