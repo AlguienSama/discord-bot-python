@@ -26,6 +26,9 @@ class CommandNotExist(CommandError):
     def __init__(self, command: str):
         self.command = command
 
+class NotPermissions(CommandError):
+    def __init__(self, permision):
+        self.permision = permision
 
 class CustomError(CommandError):
     def __init__(self, error):
@@ -77,6 +80,9 @@ async def errors(ctx: Context, error):
 
     elif isinstance(error, NotMoneyError):
         embed.description = f'Te faltan {error.money} haikoins'
+        
+    elif isinstance(error, NotPermissions):
+        embed.description = f'Te faltan permisos: {error.permision}'
 
     elif isinstance(error, CommandNotExist):
         embed.description = f'El comando {error.command} no existe'

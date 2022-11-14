@@ -4,7 +4,7 @@ import discord
 from discord.ext.commands import *
 from enum import Enum
 from utils.ddbb.economy import has_money
-from utils.errors import CustomError, MoneyError
+from utils.errors import CustomError, MoneyError, NotPermissions
 from utils.logs.economy import lose_money
 from utils.responses.Embed import Embed
 
@@ -72,12 +72,12 @@ class RRGame():
                         try:
                             await (await self.bot.fetch_guild(self.guild)).kick(discord.Object(player["id"]), reason="Russian Roulette")
                         except discord.Forbidden as e:
-                            raise e
+                            raise NotPermissions(e.error)
                     elif self.difficulty == 'Difficulty.BAN':
                         try:
                             await (await self.bot.fetch_guild(self.guild)).ban(discord.Object(player["id"]), reason="Russian Roulette")
                         except discord.Forbidden as e:
-                            raise e
+                            raise NotPermissions(e.error)
                     
                     if self.gamemode == Gamemode.ONE_DEATH:
                         ended = True
