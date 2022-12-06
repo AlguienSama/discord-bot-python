@@ -44,7 +44,7 @@ class RRGame():
         self.players = game['players']
         self.player_list = game['players']
         self.round = 0
-    
+
     def embed(self):
         embed = Embed(title='RUSSIAN ROULETTE', description='**SIGUIENTE RONDA**').warn()
         desc = ''
@@ -57,10 +57,10 @@ class RRGame():
                 desc+=f'~~{self.players[i-j]["name"]}~~\n'
         embed.add_field(title=f'JUGADORES VIVOS: {len(self.players)}', desc=desc)
         return embed.get_embed()
-    
+
     async def start(self):
         ended = False
-                    
+
         while not ended:
             num = random.randint(0, len(self.players)-1)
             for i in range(0, len(self.players)):
@@ -71,14 +71,14 @@ class RRGame():
                     if self.difficulty == 'Difficulty.KICK':
                         try:
                             await (await self.bot.fetch_guild(self.guild)).kick(discord.Object(player["id"]), reason="Russian Roulette")
-                        except discord.Forbidden as e:
-                            raise NotPermissions(e.error)
+                        except discord.Forbidden:
+                            pass
                     elif self.difficulty == 'Difficulty.BAN':
                         try:
                             await (await self.bot.fetch_guild(self.guild)).ban(discord.Object(player["id"]), reason="Russian Roulette")
-                        except discord.Forbidden as e:
-                            raise NotPermissions(e.error)
-                    
+                        except discord.Forbidden:
+                            pass
+
                     if self.gamemode == Gamemode.ONE_DEATH:
                         ended = True
                         await self.end()
@@ -136,7 +136,7 @@ class DifficultySelect(discord.ui.Select):
                 self.options[0].default = False
                 self.options[1].default = True
                 self.options[2].default = False
-            
+
             update_kick()
         elif str(self.game['difficulty']) == str(Difficulty.BAN):
             @discord.ext.commands.bot_has_guild_permissions(ban_members=True)
@@ -147,7 +147,7 @@ class DifficultySelect(discord.ui.Select):
             update_ban()
         else:
             raise CustomError('Fail Selecting Difficulty')
-    
+
     async def callback(self, interaction: discord.Interaction):
         self.set_default()
         await interaction.response.edit_message(embed=get_embed(self.game), view=self.rr_view)
@@ -171,7 +171,7 @@ class GamemodeSelect(discord.ui.Select):
             self.options[1].default = True
         else:
             raise CustomError('Fail Selecting Gamemode')
-    
+
     async def callback(self, interaction: discord.Interaction):
         self.set_default()
         await interaction.response.edit_message(embed=get_embed(self.game), view=self.rr_view)
@@ -188,18 +188,18 @@ class RRView(discord.ui.View):
         self.add_item(self.difficulty_select)
         self.exit = False
         self.task = create_task(self.timer())
-    
+
     @discord.ui.button(label='Jugar', style=discord.ButtonStyle.green, custom_id='join', row=3)
     async def join(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.in_game(interaction.user.id):
             return await interaction.response.send_message('Ya estás en la partida!', ephemeral=True)
-        
+
         global games
         game = games[str(self.game_id)]
         if not await has_money(game['guild'], interaction.user.id, game['ammount']):
             return await interaction.response.send_message('No tienes suficiente dinero', ephemeral=True)
         games[str(self.game_id)]['players'].append({'name': interaction.user.display_name, 'id': interaction.user.id})
-        
+
         await interaction.response.send_message(content='Entraste correctamente!', ephemeral=True)
         await self.message.edit(embed=get_embed(games[str(self.game_id)]), view=self)
 
@@ -215,32 +215,34 @@ class RRView(discord.ui.View):
                 del games[self.game_id]
                 self.stop()
                 return await interaction.response.edit_message(embed=Embed(description=f'Partida cancelada por {interaction.user.mention}').failure().get_embed(), view=None)
-                
+
         if not self.in_game(interaction.user.id):
             return await interaction.response.send_message('No estás en la partida', ephemeral=True)
-        
+
         i = 0
         for user in games[self.game_id]['players']:
             if int(user['id']) == interaction.user.id:
                 del games[self.game_id]['players'][i]
             i+=1
-        
+
         await interaction.response.send_message(content='Saliste correctamente!', ephemeral=True)
         await self.message.edit(embed=get_embed(games[str(self.game_id)]), view=self)
-        
-    
+
+
     @discord.ui.button(label='Empezar', style=discord.ButtonStyle.blurple, row=3)
     async def start_game(self, interaction: discord.Interaction, button: discord.ui.Button):
         global games
         if interaction.user.id != games[self.game_id]['author']:
             return await interaction.response.send_message('Solo el creador de la partida la puede iniciar!', ephemeral=True)
+        if (games[self.game_id]['difficulty'] == 'Difficulty.KICK' or games[self.game_id]['difficulty'] == 'Difficulty.BAN') and len(games[self.game_id]['players']) < 2:
+            return await interaction.response.send_message('No puedes iniciar partida con kick o ban sin ser mínimo 2 jugadores')
         self.task.cancel()
         await interaction.response.send_message(content='Juego empezado correctamente!', ephemeral=True)
         await self.init_game()
-    
+
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         global games
-        
+
         if len(self.difficulty_select.values) > 0 and self.difficulty_select.values[0] != games[self.game_id]['difficulty']:
             if interaction.user.id != games[self.game_id]['author']:
                 await interaction.response.send_message('Solo el creador de la partida la puede cambiar la dificultad del juego!', ephemeral=True)
@@ -255,18 +257,18 @@ class RRView(discord.ui.View):
             else:
                 games[self.game_id]['gamemode'] = self.gamemode_select.values[0]
         return await super().interaction_check(interaction)
-    
+
     async def on_timeout(self) -> None:
         await self.message.edit(view=None)
         await self.init_game()
-    
+
     def in_game(self, user_id):
         global games
         for user in games[self.game_id]['players']:
             if int(user['id']) == user_id:
                 return True
         return False
-    
+
     async def init_game(self):
         self.stop()
         game = RRGame(self.bot, self.game_id)
@@ -279,7 +281,7 @@ class RRView(discord.ui.View):
             self.sleep = await sleep(time)
             games[self.game_id]["time"] -= time
             await self.message.edit(embed=get_embed(games[self.game_id]))
-        
+
 
 async def russian_roulette(bot: Bot, ctx: Context, money: int = 0):
     try:
@@ -288,14 +290,14 @@ async def russian_roulette(bot: Bot, ctx: Context, money: int = 0):
             raise MoneyError(min=0)
     except:
         money = 0
-    
+
     global games
     if not 'games' in globals():
         games = {}
     if str(ctx.channel.id) in games:
         raise CustomError('Ya hay una partida en juego!')
-    
+
     games[str(ctx.channel.id)] = {'difficulty': Difficulty.PEACEFULL, 'gamemode': Gamemode.ONE_DEATH, 'ammount': money, 'time': 60, 'guild': ctx.guild.id, 'channel': ctx.channel.id, 'author':ctx.author.id, 'players': [{'name': ctx.author.display_name, 'id': ctx.author.id}]}
-    
+
     view = RRView(bot, str(ctx.channel.id))
     view.message = await ctx.channel.send(embed=get_embed(games[str(ctx.channel.id)]), view=view)
