@@ -56,9 +56,8 @@ def next_song(bot, ctx, skip=True):
         del_queue(ctx, 1, 1)
     voice = get(bot.voice_clients, guild=ctx.guild)
 
-    if not voice.is_playing():
-        reproduce(bot, ctx)
-    
+    reproduce(bot, ctx)
+
     pass
 
 

@@ -1,7 +1,6 @@
 import discord
 import json
 from utils.ddbb.DB import get_command, get_command_list
-from disputils import BotEmbedPaginator, BotConfirmation
 from datetime import datetime
 
 
@@ -35,10 +34,10 @@ async def add_command(ctx, cmd, img, args):
 
     await ctx.send(content=f'ID: `{new_cmd["id"]}` | comando: `{new_cmd["cmd"]}`', embed=embed)
 
-    confirmation = BotConfirmation(ctx=ctx, color=0x012345)
-    await confirmation.confirm("¿Quieres agregar el comando?")
+    # confirmation = BotConfirmation(ctx=ctx, color=0x012345)
+    # await confirmation.confirm("¿Quieres agregar el comando?")
 
-    if confirmation.confirmed:
+    if True:
         doc_ref = await get_command(cmd)
         DocRef = doc_ref.get()
 
@@ -56,8 +55,8 @@ async def add_command(ctx, cmd, img, args):
                 'gifs': gifs
             })
 
-        txt = "Comando agregada con exito"
-        return await confirmation.update(txt, hide_author=False, color=0x55ff55)
+        await ctx.send("Comando agregada con exito")
+        # return await confirmation.update(txt, hide_author=False, color=0x55ff55)
     else:
         return await confirmation.update("Cancelado...", hide_author=False, color=0xff5555)
 
@@ -86,16 +85,17 @@ async def remove_command(ctx, cmd, id):
             await ctx.send(content=f'ID: `{comando["id"]}` | comando: `{comando["cmd"]}` | user: {comando["user"]}',
                            embed=embed)
 
-            confirmation = BotConfirmation(ctx=ctx, color=0x012345)
-            await confirmation.confirm("¿Quieres eliminar el comando?")
+            #confirmation = BotConfirmation(ctx=ctx, color=0x012345)
+            #await confirmation.confirm("¿Quieres eliminar el comando?")
 
-            if confirmation.confirmed:
+            if True:
                 gifs.remove(g)
                 doc_ref.update({
                     'gifs': gifs
                 })
                 txt = "Comando eliminado con exito"
-                return await confirmation.update(txt, hide_author=False, color=0x55ff55)
+                await ctx.send(txt)
+                #return await confirmation.update(txt, hide_author=False, color=0x55ff55)
             else:
                 return await confirmation.update("Cancelado...", hide_author=False, color=0xff5555)
 
