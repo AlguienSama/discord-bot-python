@@ -1,7 +1,8 @@
 import os
 import openai
 
-async def openai_chatgpt(ctx, prompt): 
+async def openai_chatgpt(ctx, prompt):
+    msg = await ctx.send('Pensando una respuesta, espera un momento...')
     openai.api_key = os.getenv("OPENAI_API")
     response = openai.Completion.create(
         model="text-davinci-003",
@@ -15,4 +16,4 @@ async def openai_chatgpt(ctx, prompt):
     )
 
     answer = response.choices[0].text.strip()
-    return await ctx.send(content=answer)
+    return await msg.edit(content=answer)
