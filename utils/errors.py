@@ -26,9 +26,11 @@ class CommandNotExist(CommandError):
     def __init__(self, command: str):
         self.command = command
 
+
 class NotPermissions(CommandError):
     def __init__(self, permision):
         self.permision = permision
+
 
 class CustomError(CommandError):
     def __init__(self, error):
@@ -51,12 +53,17 @@ async def errors(ctx: Context, error):
         embed.description = 'Command Not Found'
         return
 
+    elif isinstance(error, CommandOnCooldown):
+        embed.description = 'Comando en enfriamiento, intenta en {:.0f} segundos'.format(error.retry_after)
+
     elif isinstance(error, TimeoutError):
         embed.description = 'Fin del tiempo'
 
     elif isinstance(error, MissingRequiredArgument):
-        embed.description = '**{}** es un argumento requerido'.format(error.param)
-        embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
+        embed.description = '**{}** es un argumento requerido'.format(
+            error.param)
+        embed.add_field('_ _', '{}\n`{}{} {}`'.format(
+            ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
 
     elif isinstance(error, MissingPermissions):
         print(error.missing_perms)
@@ -80,7 +87,7 @@ async def errors(ctx: Context, error):
 
     elif isinstance(error, NotMoneyError):
         embed.description = f'Te faltan {error.money} haikoins'
-        
+
     elif isinstance(error, NotPermissions):
         embed.description = f'Te faltan permisos: {error.permision}'
 
@@ -97,11 +104,12 @@ async def errors(ctx: Context, error):
         embed.description = 'Permisos insuficientes para enviar el mensaje'
 
     elif isinstance(error, CommandInvokeError):
-        
+
         print(error)
         if isinstance(error.original, ValueError):
             embed.description = f'Debes de introducir los parámetros correctamente'
-            embed.add_field('_ _', '{}\n`{}{} {}`'.format(ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
+            embed.add_field('_ _', '{}\n`{}{} {}`'.format(
+                ctx.command.description, ctx.prefix, ctx.command.name, ctx.command.help))
 
         elif isinstance(error.original, NoneType):
             embed.description = f'Debes de introducir los parámetros correctamente'
@@ -117,8 +125,8 @@ async def errors(ctx: Context, error):
             print(type(error.original))
             print(error.original)
             print(error.__context__)
-            embed.description = 'Error al ejecutar un comando\n`{}`\n`{}`\nAvisa a un administrador'.format(error.args,
-                                                                                                            error.original)
+            embed.description = 'Error al ejecutar un comando\n`{}`\n`{}`\nAvisa a un administrador'.format(
+                error.args, error.original)
 
     else:
         embed.description = error.__class__.__name__

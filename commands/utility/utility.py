@@ -1,7 +1,8 @@
-from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner
+from discord.ext.commands import Bot, Cog, Context, command, check_any, is_owner, cooldown, BucketType
 from .commands.ping import GetPing
 from .commands.say import say
 from .commands.server import server
+from .commands.chatgpt import openai_chatgpt
 from .commands.exp import experiencia, getExp, rank_xp
 from .commands.AI import colorizer, super_resolution, waifu2x, text_to_image, toonify
 from commands.admin.commands.checks import is_enabled_channel, _is_enabled_channel, is_disabled_command
@@ -83,6 +84,12 @@ class Utiles(Cog):
     async def _server(self, ctx: Context):
         """ """
         return await server(ctx)
+
+    @command(name = "ask", alias=['aurora', 'pregunta'], description = "Haz una pregunta al bot")
+    @cooldown(1, 5, BucketType.channel)
+    async def _openai_chatgpt (self, ctx: Context, *, question: str):
+        """ """
+        return await openai_chatgpt(ctx, question)
 
 
 async def setup(bot: Bot) -> None:
