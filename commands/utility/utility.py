@@ -7,6 +7,7 @@ from .commands.exp import experiencia, getExp, rank_xp
 from .commands.AI import colorizer, super_resolution, waifu2x, text_to_image, toonify
 from commands.admin.commands.checks import is_enabled_channel, _is_enabled_channel, is_disabled_command
 from commands.together.commands.discord_together import *
+import os
 
 
 class Utiles(Cog):
@@ -86,7 +87,7 @@ class Utiles(Cog):
         return await server(ctx)
 
     @command(name = "ask", alias=['aurora', 'pregunta'], description = "Haz una pregunta al bot")
-    @cooldown(1, 5, BucketType.channel)
+    @cooldown(1, os.getenv("OPENAI_CD"), BucketType.channel)
     async def _openai_chatgpt (self, ctx: Context, *, question: str):
         """ """
         return await openai_chatgpt(ctx, question)
