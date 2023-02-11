@@ -1,5 +1,6 @@
 utils/ddbb/keys/*
 utils/ddbb/queue.json
+utils/ddbb/chatgpt.json
 .env
 __pycache__/
 .vscode
