@@ -9,15 +9,15 @@ async def openai_chatgpt(ctx, prompt):
 
     prompt_history = {}
     server_history = ''
-    guild_id = str(ctx.guild.id)
+    channel_id = str(ctx.channel.id)
     try:
         with open(chatgpt_history,"r",encoding="utf-8") as file:
             prompt_history = json.load(file)
-            server_history = '/n'.join(prompt_history[guild_id])
+            server_history = '/n'.join(prompt_history[channel_id])
     except Exception as e:
         print(f'Error CHATGPT: {e}')
         open(chatgpt_history, "w")
-        prompt_history[guild_id] = []
+        prompt_history[channel_id] = []
     openai.api_key = os.getenv("OPENAI_API")
 
     response = openai.Completion.create(
@@ -36,12 +36,12 @@ async def openai_chatgpt(ctx, prompt):
     if answer == '':
         return await msg.edit(content="Error, vuelve a preguntar de nuevo")
 
-    prompt_history[guild_id].append(prompt)
-    prompt_history[guild_id].append(answer)
+    prompt_history[channel_id].append(prompt)
+    prompt_history[channel_id].append(answer)
 
     #eliminar elementos que excedan x numero#
-    if len(prompt_history[guild_id]) >= 6:
-        del prompt_history[guild_id][:2]
+    if len(prompt_history[channel_id]) >= 6:
+        del prompt_history[channel_id][:2]
 
     #guardar#
     with open(chatgpt_history, 'w',encoding="utf-8") as file:
