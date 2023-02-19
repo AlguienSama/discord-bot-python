@@ -12,16 +12,18 @@ async def openai_chatgpt(ctx, prompt):
     guild_id = str(ctx.guild.id)
     try:
         with open(chatgpt_history,"r",encoding="utf-8") as file:
-            prompt_history = " ".join(json.load(file))
-            server_history = prompt_history[guild_id]
+            prompt_history = json.load(file)
+            server_history = '/n'.join(prompt_history[guild_id])
     except:
         open(chatgpt_history, "w")
         prompt_history[guild_id] = []
     openai.api_key = os.getenv("OPENAI_API")
 
+    print(f"Text. {server_history}, {prompt}")
+
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt=f"{'/n'.join(server_history)}, {prompt}",
+        prompt=f"{server_history[:2]}, {prompt}",
         temperature=0.9,
         max_tokens=500,
         top_p=1,
@@ -32,9 +34,11 @@ async def openai_chatgpt(ctx, prompt):
 
     answer = response.choices[0].text.strip()
 
+    if answer == '':
+        return await msg.edit(content="Error, vuelve a preguntar de nuevo")
+
     prompt_history[guild_id].append(prompt)
     prompt_history[guild_id].append(answer)
-    prompt_history[guild_id].append("¿Algo más con lo que pueda ayudarte?")
 
     #eliminar elementos que excedan x numero#
     if len(prompt_history[guild_id]) >= 24:
