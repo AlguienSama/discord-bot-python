@@ -19,8 +19,6 @@ async def openai_chatgpt(ctx, prompt):
         prompt_history[guild_id] = []
     openai.api_key = os.getenv("OPENAI_API")
 
-    print(f"Text. {server_history}, {prompt}")
-
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=f"{server_history[-4:]}, {prompt}",
