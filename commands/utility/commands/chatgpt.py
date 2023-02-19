@@ -14,8 +14,7 @@ async def openai_chatgpt(ctx, prompt):
         with open(chatgpt_history,"r",encoding="utf-8") as file:
             prompt_history = json.load(file)
             server_history = '/n'.join(prompt_history[channel_id])
-    except Exception as e:
-        print(f'Error CHATGPT: {e}')
+    except:
         open(chatgpt_history, "w")
         prompt_history[channel_id] = []
     openai.api_key = os.getenv("OPENAI_API")
