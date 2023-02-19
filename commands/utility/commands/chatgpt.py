@@ -23,7 +23,7 @@ async def openai_chatgpt(ctx, prompt):
 
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt=f"{server_history[:2]}, {prompt}",
+        prompt=f"{server_history[-4:]}, {prompt}",
         temperature=0.9,
         max_tokens=500,
         top_p=1,
@@ -42,7 +42,7 @@ async def openai_chatgpt(ctx, prompt):
 
     #eliminar elementos que excedan x numero#
     if len(prompt_history[guild_id]) >= 24:
-        del prompt_history[guild_id][:6]
+        del prompt_history[guild_id][:20]
 
     #guardar#
     with open(chatgpt_history, 'w',encoding="utf-8") as file:
