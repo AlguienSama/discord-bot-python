@@ -13,7 +13,7 @@ async def openai_chatgpt(ctx, prompt):
     try:
         with open(chatgpt_history,"r",encoding="utf-8") as file:
             prompt_history = json.load(file)
-            server_history = '\n'.join(prompt_history[channel_id])
+            server_history = '. '.join(prompt_history[channel_id])
     except:
         open(chatgpt_history, "w")
         prompt_history[channel_id] = []
@@ -21,8 +21,7 @@ async def openai_chatgpt(ctx, prompt):
 
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt=f"{prompt}",
-        context=f"{server_history}",
+        prompt=f"{server_history} ----------\n{prompt}",
         temperature=0.9,
         max_tokens=500,
         top_p=1,
@@ -40,7 +39,7 @@ async def openai_chatgpt(ctx, prompt):
     prompt_history[channel_id].append(answer)
 
     #eliminar elementos que excedan x numero#
-    if len(prompt_history[channel_id]) >= 8:
+    if len(prompt_history[channel_id]) >= 6:
         del prompt_history[channel_id][:2]
 
     #guardar#
